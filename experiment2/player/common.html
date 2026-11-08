@@ -21,6 +21,8 @@
 @media(max-height:600px){#choices button{min-height:44px}}
 
 #demoTools{position:absolute;top:6px;left:6px;z-index:30;max-width:94%;background:#fff;padding:5px;font-size:12px}#demoTools button{font-size:12px;min-height:36px;padding:4px 8px}
+
+#overlay{font-size:clamp(24px,6vw,32px);font-weight:700;line-height:1.35;max-width:90%;text-align:center;top:max(18px,env(safe-area-inset-top));padding:7px 14px;}
 </style><main>
 <div class="stage"><video id="video" muted playsinline preload="auto"></video><canvas id="cover" width="576" height="768" hidden></canvas></div>
 <span id="position">C01</span><div id="overlay"></div><p id="caption"></p>
@@ -41,7 +43,7 @@ const imported=new Map(),fileRecords=new Map();
 let part=0,phase='idle',previousPhase=null,epoch=0,events=[],choiceResolved=false;
 let waitMs=0,waitMark=null,wallPaused=false,exposed=false,captionId='',visualScreen=null,loadedVideo='',pendingStation=false;
 const segment=()=>config.segments[part];
-const src=kind=>imported.get(part+'_'+kind)||segment()[kind];
+const src=kind=>imported.get(part+'_'+kind)||window.LG2_PRELOADED?.get(segment()[kind])||segment()[kind];
 function record(type,details={}){
  events.push({group:config.group,type,part:segment().id,screen:captionId,audioSeconds:audio.currentTime||0,
  monotonicMs:performance.now(),atISO:new Date().toISOString(),...details});
@@ -191,7 +193,7 @@ function saveResponse(choice){
  sensoryValue:q.questionType==='sensory'?option?.text||null:null,
  clarityValue:q.questionType==='clarity'?option?.text||null:null,
  audioResumedAtISO:null,audioResumedAtMonotonicMs:null,
- timeoutPolicy:config.backgroundWaitPolicy,timeoutPolicyApproved:false};
+ timeoutPolicy:config.backgroundWaitPolicy,timeoutPolicyApproved:!!config.timeoutPolicyApproved};
  responses.push(response);pendingRecovery=response;
  record(choice===null?'choice_timeout':'choice_clicked',{response});
 }
@@ -269,7 +271,7 @@ $('start').onclick=async()=>{
  }
  room.pause();room.currentTime=0;fxFailed=false;epoch++;events=[];responses=[];currentQuestion=null;pendingRecovery=null;part=0;waitMs=0;waitMark=null;choiceResolved=false;cover.hidden=true;
  record('sample_start',{version:config.version,audioVersion:config.audioVersion,pauseHandling:config.pauseHandling,
-  environmentEnabled:soundEnabled,environmentVersion:config.environmentVersion,timeoutPolicy:config.backgroundWaitPolicy,timeoutPolicyApproved:false,importedMedia:Array.from(fileRecords.entries())});
+  environmentEnabled:soundEnabled,environmentVersion:config.environmentVersion,timeoutPolicy:config.backgroundWaitPolicy,timeoutPolicyApproved:!!config.timeoutPolicyApproved,importedMedia:Array.from(fileRecords.entries())});
  $('settings').open=false;await enter();
 };
 $('policy').onchange=()=>{
@@ -388,4 +390,4 @@ if(['concrete','unclear','timeout'].includes(demonstration)){
  alignVideoOverlays();
 })();
 </script>
-<script src="bridge.js"></script>
+<script src="bridge.js?v=20261108-preload1"></script>

@@ -241,7 +241,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
     }
     state.videoInterrupted = true; await checkpoint('before_video');
     const reuse=!common&&retainedFrame&&retainedFrame.isConnected;
-    if(!reuse)ui.main.innerHTML = '<iframe id="practiceFrame" title="互动练习" allow="autoplay" src="player/' + group + '.html?embedded=1"></iframe>';
+    if(!reuse)ui.main.innerHTML = '<iframe id="practiceFrame" title="互动练习" allow="autoplay" src="player/' + group + '.html?embedded=1&build=20261108-preload1"></iframe>';
     playerFrame = reuse?retainedFrame:$('practiceFrame');retainedFrame=null;playerNonce=uuid();
     return new Promise((resolve, reject) => {
       let closed = false;
@@ -264,7 +264,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
         if (e.data.type === 'ready') {
           playerFrame.contentWindow.postMessage({ channel: 'LG2_PARENT', type: 'configure', nonce: playerNonce,
             group, parameters: playerParameters(), timeoutPolicy: cfg.BACKGROUND_WAIT_POLICY,
-            timeoutPolicyApproved: cfg.BACKGROUND_POLICY_APPROVED }, location.protocol === 'file:' ? '*' : location.origin);
+            timeoutPolicyApproved: cfg.BACKGROUND_POLICY_APPROVED, routePreloads: common ? ['R','S'].map(g => window.LG2_MEDIA_CONFIGS[g].segments[0]) : [] }, location.protocol === 'file:' ? '*' : location.origin);
           return;
         }
         if (e.data.nonce !== playerNonce) return;
