@@ -4,8 +4,10 @@ RUN_MODE=live、PHASE=PILOT。正式入口真实上传；演练入口 index.html
 
 2026-11-08｜分组号占用记录：本地演练 0 个；本轮真实验收新增 1 个（condition=1，SD）；历史通过 live 链接试跑的累计占用数待 DataPipe 后台核实，不能用 116 次拒收或 0 个 Completed sessions 推算。
 
-验收编号 PILOT-ACCEPTANCE-20261108-01；这是技术验收数据，必须排除于 PILOT 分析。真实试收使用线上 v1.1.1 原网页，v1.1.2 仅增加演练网络拦截并同步版本与清单，不改 live 上传格式和测量内容。
+验收编号 PILOT-ACCEPTANCE-20261108-01；这是技术验收数据，必须排除于 PILOT 分析。真实试收使用线上 v1.1.1 原网页，v1.1.2 增加演练网络拦截、PRERUN 阶段标记与收尾上传队列持续清空，不改 live 上传格式和测量内容。
 研究者已关闭不匹配的 DataPipe Validation；此后 API 接受 JSON 与独立录音，正在核验最终收件。主快照禁止 pendingFiles，录音只保留元数据。
 
 检查：python3 tools/check_release.py --production；追加 --pilot 检查备用配置。
 历史版本保留。手机真机自然时长验收不能由桌面自动流程代替。
+
+阶段字段统一 P / C / PRERUN / PILOT。演练自动 testData=true、phase=PRERUN；真实 PILOT 为 testData=false。技术验收虽通过 live 入口，仍必须按验收编号排除。

@@ -1,5 +1,5 @@
 {
-  "materialHash": "79af573cb6379411e3ed7544061d7ae18a01c6b8df52484c1bdf663b67e3a123",
+  "materialHash": "53de552f1ff91a5961ce7705e81f14a998d19518f31ba77e0d175c760a7a6b29",
   "code": {
     "config.PILOT.js": "88bf6048403eeb413ca993ecc62ff1faa6ed226fecd989f1be9596994f3fcf95",
     "credamo.html": "0dce737e3a9ec28b4ff994a2849a7826c9bbf693fa2931e7430716a28687e28a",
@@ -11,7 +11,7 @@
     "js/core.js": "cce3b09e2bd4ff9f966c8e7f643c207445c1e6f274b4d68717a663f53eee870f",
     "js/media-configs.js": "9f3b2de85e7b09accf07f5fb8cf2fc0917faa307de01ecb33be33698def1e6cf",
     "js/recording.js": "6f63f42f2e314d4fac8eebfd9a28f623648fe7f954df9aff4ee2bfa8d7273342",
-    "js/storage.js": "2f813069dc2ea0cf2a59452a6afcbc58781ae1b0f1616b300d5d274db3e5813e",
+    "js/storage.js": "aa3035eb6699b848edda769cb189517cbcbfedf8bf3fe5201488c0e496a6c980",
     "js/ui.js": "f0d11fcfab39dd4df4733c686b65f3ca570c1326cf5e6f0e84717d0f6ddc4440",
     "naodao.html": "5d8c051bf41347661e5ca26c80f4f2dd69d269606d402bd98abf6dd6ef0949ab",
     "offline.html": "73b5bd0d9db67219afb671a9d0f1d3556f901d57799cb2be45bcf3b795ce0804",

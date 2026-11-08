@@ -90,8 +90,11 @@ window.LG2Storage = (() => {
   function flush(key) {
     if (flushing) return flushing;
     flushing = (async () => {
-      const entries = (await all('queue')).filter(e => e.sessionKey === key && !e.testData);
       let saved = 0;
+      // Include files enqueued while an earlier batch is uploading, including final.
+      while (true) {
+      const entries = (await all('queue')).filter(e => e.sessionKey === key && !e.testData);
+      if (!entries.length) return { saved, pending: 0 };
       for (const entry of entries) {
         try {
           await request(entry.kind === 'recording' ? 'base64' : 'data', {
@@ -100,13 +103,14 @@ window.LG2Storage = (() => {
         } catch (error) {
           // The queue payload and random filename are immutable. A duplicate acknowledges a previous retry.
           if (!(error.code === 'FILE_EXISTS' || /already exists|file exists/i.test(error.message))) {
-            return { saved, pending: entries.length - saved, error: String(error) };
+            const pending = (await all('queue')).filter(e => e.sessionKey === key && !e.testData).length;
+            return { saved, pending, error: String(error) };
           }
         }
         await transaction(['queue'], 'readwrite', tx => tx.objectStore('queue').delete(entry.filename));
         saved++;
       }
-      return { saved, pending: 0 };
+      }
     })().finally(() => { flushing = null; });
     return flushing;
   }
