@@ -1,5 +1,5 @@
 window.LG2_CONFIG = {
-  VERSION: 'experiment2-full-v1.1.1',
+  VERSION: 'experiment2-full-v1.1.2',
   PROTOCOL: 'v0.9 draft + approved v0.9C text / three-layer choices / v0.16 media',
   MODE: 'review',
   RUN_MODE: 'live', // PILOT材料预实验真实上传；试收需使用测试编号

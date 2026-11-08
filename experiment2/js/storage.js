@@ -59,6 +59,10 @@ window.LG2Storage = (() => {
     }
   }
   async function request(path, body) {
+    // Defence in depth: rehearsal must never consume a live allocation or upload.
+    const rehearsal = window.LG2_CONFIG?.RUN_MODE === 'prerun' ||
+      (typeof location !== 'undefined' && new URLSearchParams(location.search).get('mode') === 'preview');
+    if (rehearsal) throw Error('本地演练禁止调用DataPipe');
     if(path === 'data') {
       const data = JSON.parse(body.data);
       if(data.schemaVersion || Object.prototype.hasOwnProperty.call(data,'pendingFiles')) validateMainSnapshot(data);
