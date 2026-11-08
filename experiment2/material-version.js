@@ -1,0 +1,1 @@
+window.LG2_MATERIAL_HASH="3cfcb14e007deafc2ab4f12cc6ae86525adc476fe0342faef3bfc9408f44fad2";

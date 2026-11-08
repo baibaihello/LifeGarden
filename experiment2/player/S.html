@@ -1,0 +1,391 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>实验练习 · 三层选择互动候选 · 生命最后一天 · S组平移版</title><style>*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#d6d4cf;color:#25312b;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}body{overflow:hidden}main{position:relative;width:100%;height:100vh;height:var(--app-height,100vh);min-height:400px}.stage{position:absolute;inset:0 0 72px;display:grid;place-items:center;background:#d6d4cf}.stage video,.stage canvas{position:absolute;width:100%;height:100%;object-fit:contain}#caption{position:absolute;left:50%;bottom:88px;transform:translateX(-50%);width:min(94%,620px);margin:0;padding:14px 18px;font-size:clamp(17px,2.5vw,23px);line-height:1.65;background:rgba(248,247,243,.93);border-radius:12px;z-index:3}#overlay{position:absolute;top:18px;left:50%;transform:translateX(-50%);z-index:2;background:#f6f3ecdd;padding:4px 12px;border-radius:8px}#overlay:empty{display:none}.actions{position:absolute;bottom:max(10px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:12px;width:min(94%,620px);height:48px;z-index:6}button{font:inherit;font-size:17px;min-height:44px;padding:10px 20px;border:1px solid #879589;border-radius:12px;color:#253d2f;background:#f7f6f2;cursor:pointer}.actions button{flex:1}button:disabled{opacity:.45}#choicePanel{position:absolute;bottom:76px;left:50%;transform:translateX(-50%);width:min(94%,620px);padding:16px;background:#f8f7f2fa;border:1px solid #d2d7cf;border-radius:16px;z-index:5;box-shadow:0 -4px 24px #0001}#choiceTitle{font-size:16px;margin:0 0 10px;font-weight:400}#choices{display:grid;gap:7px}#choices button{text-align:left;width:100%;background:#e8eee5}body:has(#choicePanel:not([hidden])) #caption{visibility:hidden}#intro{position:absolute;inset:0;z-index:10;background:#eceae5f7;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center}#intro h1{font-size:28px;font-weight:600;margin:0 0 18px}#intro p{max-width:420px;font-size:17px;line-height:1.8;margin:0 0 28px}#start{background:#385d48;color:white;border:0;min-width:220px;padding:15px;font-size:21px}#status{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:8;background:#f5f3eced;border-radius:8px;font-size:14px;max-width:90%;padding:4px 10px}#status:empty{display:none}#end{margin-top:20px}#position{display:none}[hidden]{display:none!important}@media(max-height:600px){#choicePanel{padding:10px;bottom:62px}#choices{gap:4px}#choices button{padding:6px 12px}.actions{height:44px;bottom:6px}#caption{bottom:66px;font-size:16px;padding:9px 12px}.stage{bottom:58px}}
+/* Participant-facing overlay refinement: no opaque subtitle card or boxed answers. */
+#caption{background:transparent;border-radius:0;color:#fff;text-shadow:0 1px 3px #000c;padding:10px 14px;font-weight:400;line-height:1.65}
+#choicePanel{border:0;border-radius:0;box-shadow:none;background:linear-gradient(to bottom,rgba(25,31,27,0),rgba(25,31,27,.62) 22%,rgba(25,31,27,.68));width:min(100%,720px);padding:34px 22px 14px;color:#fff}
+#choiceTitle{color:#fff;text-shadow:0 1px 3px #000;outline:none;font-size:17px;line-height:1.5}
+#choices{gap:0}#choices button{display:flex;align-items:center;gap:12px;background:transparent;color:#fff;border:0;border-bottom:1px solid #ffffff35;border-radius:0;text-shadow:0 1px 3px #000;padding:10px 8px;min-height:48px}
+#choices button::before{content:"";display:block;width:16px;height:16px;flex:0 0 16px;border:1.5px solid #ffffffe6;border-radius:50%}
+#choices button:hover,#choices button:focus-visible{background:#ffffff18}#choices button:active{background:#ffffff30}
+@media(max-height:600px){#choicePanel{padding:20px 16px 8px}#choices button{min-height:44px;padding:7px 8px}#choiceTitle{font-size:15px;margin-bottom:4px}}
+
+/* v0.4.4 layout only: variables measured from the displayed video rectangle */
+#caption,#choicePanel{
+ left:var(--frame-center-x,50%);transform:translateX(-50%);
+ width:var(--frame-safe-width,88%);max-width:none;box-sizing:border-box;
+ margin-left:0;margin-right:0;
+}
+#caption{padding-left:0;padding-right:0;overflow-wrap:anywhere}
+#choicePanel{padding-left:0;padding-right:0}
+#choices{min-width:0}
+#choices button{min-width:0;width:100%;min-height:48px;padding-left:4px;padding-right:4px;white-space:normal;overflow-wrap:anywhere}
+@media(max-height:600px){#choices button{min-height:44px}}
+
+#demoTools{position:absolute;top:6px;left:6px;z-index:30;max-width:94%;background:#fff;padding:5px;font-size:12px}#demoTools button{font-size:12px;min-height:36px;padding:4px 8px}
+</style><main>
+<div class="stage"><video id="video" muted playsinline preload="auto"></video><canvas id="cover" width="576" height="768" hidden></canvas></div>
+<span id="position">C01</span><div id="overlay"></div><p id="caption"></p>
+<section id="choicePanel" hidden><h2 id="choiceTitle" tabindex="-1">请选择最接近你此刻想法的一项</h2><div id="choices"></div></section>
+<div class="actions"><button id="pause">暂停</button><button id="exit">退出</button></div><p id="status" role="status"></p>
+<section id="intro"><h1>一段互动练习</h1><p>请打开声音。本片有三次选择，点选后继续观看。<br>选择用来记录你注意到了什么，后面的内容按原顺序继续。</p><p id="variant"></p><button id="start">开始观看</button><p id="end" hidden>本次观看已结束。</p></section>
+<details id="settings" hidden><select id="policy"><option value="foreground_active" selected>前台计时</option><option value="wall_clock">后台计时</option></select><div id="inputs"></div><button id="export">导出记录</button></details></main><audio id="audio" preload="auto"></audio><script id="config" type="application/json">{"version": "R组旧图原色对照v0.8_S", "audioVersion": "实录声学初校；S01—S04保留验收音轨", "textVersion": "v0.9C及批准共同段补丁", "pauseHandling": "音轨已含4秒，不重复增加", "timeoutSeconds": 20, "backgroundWaitPolicy": "foreground_active", "segments": [{"id": "part1", "audio": "media/S_audio1.wav", "video": "media/S_video1.mp4", "duration": 19.259410430839004, "station": true, "stationAt": null, "captions": [{"id": "S01", "start": 0, "end": 12.121065759637188, "text": "这是你死亡的那一天的早上。时间停在这里，你哪里也不去。先看看，光从哪里来。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "S02", "start": 12.121065759637188, "end": 19.259410430839004, "text": "你还在这个房间里。在这一刻停一下。此刻，你最先注意到的可能是——", "freeze": "media/S02_freeze.png", "overlay": "", "video": null, "mediaIn": 0}], "timingStatus": "实录声学边界初校；逐字听审待完成", "visualStatus": "研究者认可 B02 新房间；固定比例平移", "environmentRoom": true}, {"id": "part2", "audio": "media/S_audio2.wav", "video": "media/S_video2.mp4", "duration": 19.930385487528344, "station": false, "stationAt": null, "captions": [{"id": "S03", "start": 0, "end": 10.554149659863945, "text": "这会儿，身边有谁？也许有人，也许只有你自己。看看身边的那个位置。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "S04", "start": 10.554149659863945, "end": 19.930385487528344, "text": "手边可能放着几样你常用的东西。看看其中一样，认一认它。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}], "timingStatus": "实录声学边界初校；逐字听审待完成", "visualStatus": "研究者认可 B02 新房间；固定比例平移", "environmentRoom": true}, {"id": "part3", "audio": "media/S_audio3.wav", "video": "media/S_video3.mp4", "duration": 18.64952380952381, "station": true, "stationAt": null, "timingStatus": "沿用实录声学初校，逐字听审待完成", "visualStatus": "B02独立原图，原有平移，无局部变形", "captions": [{"id": "S05", "start": 0, "end": 11.050430839002267, "text": "房间外面，可能有声音传进来。听一听，它是什么，远，还是近。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "S06", "start": 11.050430839002267, "end": 18.64952380952381, "text": "时间没有动，你哪里也不去。停一下。此刻，你最先注意到的可能是——", "freeze": "media/S06_freeze.png", "overlay": "", "video": null, "mediaIn": 0}], "environmentRoom": true}, {"id": "part4", "audio": "media/S_audio4.wav", "video": "media/S_video4.mp4", "duration": 19.982403628117915, "station": false, "stationAt": null, "timingStatus": "沿用实录声学初校，逐字听审待完成", "visualStatus": "B02独立原图，原有平移，无局部变形", "captions": [{"id": "S07", "start": 0, "end": 9.56517006802721, "text": "低头看看这一天的自己：可能穿着什么，手是什么样，在做什么。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "S08", "start": 9.56517006802721, "end": 19.982403628117915, "text": "门外有脚步声，近了，又远了。你留在房间里，听着它过去。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}], "environmentRoom": true}, {"id": "part5", "audio": "media/S_audio5.wav", "video": "media/S_video5.mp4", "duration": 16.675600907029477, "station": true, "stationAt": null, "timingStatus": "沿用实录声学初校；逐字听审待完成", "visualStatus": "B02新图候选，固定比例平移；T01念完后淡到中性底色", "captions": [{"id": "S09", "start": 0, "end": 9.374285714285714, "text": "房间里可能很安静。看看一个安静的角落，把目光留在那里。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "S10", "start": 9.374285714285714, "end": 16.675600907029477, "text": "你还在这一天里，时间没有动。停一下。此刻，你最先注意到的可能是——", "freeze": "media/S10_freeze.png", "overlay": "", "video": null, "mediaIn": 0}], "environmentRoom": true}, {"id": "part6", "audio": "media/S_audio6.wav", "video": "media/S_video6.mp4", "duration": 40.522018140589566, "station": false, "stationAt": null, "timingStatus": "沿用实录声学初校；逐字听审待完成", "visualStatus": "B02新图候选，固定比例平移；T01念完后淡到中性底色", "captions": [{"id": "S11", "start": 0, "end": 10.180770975056689, "text": "看看周围的东西，身边的位置，还有你自己。你仍在这个房间里。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "S12", "start": 10.180770975056689, "end": 21.399433106575962, "text": "你留在死亡的这一天里。还是这个房间，这些东西，那一天的你。哪里也不去。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "T01", "start": 21.399433106575962, "end": 29.859160997732424, "text": "这段想象到这里结束。现在，看看屏幕外。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "T02", "start": 29.859160997732424, "end": 40.522018140589566, "text": "看看你此刻所在的地方：手边的东西，周围的光。今天，你在这里。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}], "environmentRoom": true}], "options": ["身边的人", "周围的东西", "房间的样子", "自己的身体", "没有清楚画面"], "backgroundPolicyNote": "仅审片暂用前台计时，正式策略待确认", "environmentVersion": "关窗安静v0.2；无车辆", "scope": "C01—C05、S01—S12、T01—T02", "group": "S", "interactionVersion": "three-layer-candidate-v1", "analysisUse": "stations2and3_descriptive_only", "threeLayerPrompts": {"sensoryTemplate": "关于「{领域}」，此刻你注意到的是——", "reselect": "现在呢？", "clarity": "此刻，画面有多清楚？"}}</script><script>function setViewportHeight(){document.documentElement.style.setProperty('--app-height',(window.visualViewport?window.visualViewport.height:window.innerHeight)+'px')}setViewportHeight();window.addEventListener('resize',setViewportHeight);if(window.visualViewport)window.visualViewport.addEventListener('resize',setViewportHeight);const config=JSON.parse(document.getElementById('config').textContent);
+const $=id=>document.getElementById(id);
+const audio=$('audio'),video=$('video'),cover=$('cover'),ctx=cover.getContext('2d');
+const soundEnabled=new URLSearchParams(location.search).get('sound')!=='off';
+const room=new Audio('media/room_loop.wav'),fx=new Audio();room.loop=true;room.preload='auto';fx.preload='auto';let roomFailed=false,fxFailed=false;
+$('variant').textContent=soundEnabled?'共同开头及卧室采用关窗低底声':'无环境声对照';
+const notice=document.createElement('div');notice.style.cssText='position:absolute;top:36px;left:10px;z-index:20;background:#fff;color:#333;padding:4px';notice.hidden=true;document.querySelector('main').append(notice);
+function ambientFail(kind,e){if(kind==='room')roomFailed=true;else fxFailed=true;record('environment_error',{kind,reason:String(e)});notice.textContent='环境声未能播放；当前按无该层声音继续。';notice.hidden=false;}
+room.onerror=()=>ambientFail('room','load');fx.onerror=()=>ambientFail('fx','load');
+function ambientSync(){if(!soundEnabled||roomFailed)return;if(!segment().environmentRoom){room.pause();return;}if(['idle','paused','complete','exited'].includes(phase)){room.pause();}else if(room.paused){room.play().catch(e=>ambientFail('room',e));}}
+const imported=new Map(),fileRecords=new Map();
+let part=0,phase='idle',previousPhase=null,epoch=0,events=[],choiceResolved=false;
+let waitMs=0,waitMark=null,wallPaused=false,exposed=false,captionId='',visualScreen=null,loadedVideo='',pendingStation=false;
+const segment=()=>config.segments[part];
+const src=kind=>imported.get(part+'_'+kind)||segment()[kind];
+function record(type,details={}){
+ events.push({group:config.group,type,part:segment().id,screen:captionId,audioSeconds:audio.currentTime||0,
+ monotonicMs:performance.now(),atISO:new Date().toISOString(),...details});
+}
+function status(text){$('status').textContent=text;}
+function active(){return !['idle','complete','exited'].includes(phase);}
+function ui(){
+ ambientSync();
+ $('pause').disabled=!active();
+ $('pause').textContent=phase==='paused'?'继续':'暂停';
+ $('start').disabled=active(); $('intro').hidden=active(); $('start').textContent=phase==='complete'?'再看一次':phase==='exited'?'重新开始':'开始观看';
+ $('choicePanel').hidden=phase!=='waiting'&&phase!=='revealing'; $('caption').hidden=phase==='waiting'||phase==='revealing'||(phase==='paused'&&['waiting','revealing'].includes(previousPhase));
+ $('exit').disabled=!active();
+ $('end').hidden=phase!=='complete';
+}
+function stop(){audio.pause();video.pause();fx.pause();}
+function preserve(){
+ if(!cover.hidden||video.readyState<2)return;
+ try{ctx.drawImage(video,0,0,cover.width,cover.height);cover.hidden=false;}
+ catch(error){record('cover_error',{reason:String(error)});}
+}
+function tickWait(){
+ const now=performance.now();
+ if(waitMark!==null)waitMs+=Math.max(0,now-waitMark);
+ waitMark=now;
+}
+function pause(reason='manual_pause'){
+ if(!active()||phase==='paused')return;
+ previousPhase=phase==='revealing'?'revealing':phase==='waiting'?'waiting':'playing';
+ if(phase==='waiting')tickWait();
+ wallPaused=['background_pause','pagehide_pause'].includes(reason)&&config.backgroundWaitPolicy==='wall_clock';
+ epoch++;stop();phase='paused';record(reason);ui();status('已暂停，点继续接着看。');
+}
+function mediaReady(media,minimum){
+ if(media.readyState>=minimum&&!media.seeking)return Promise.resolve();
+ return new Promise((resolve,reject)=>{
+  const timer=setTimeout(()=>finish(new Error('素材加载超时')),15000);
+  const check=()=>{if(media.readyState>=minimum&&!media.seeking)finish();};
+  const fail=()=>finish(new Error('素材无法加载'));
+  function finish(error){
+   clearTimeout(timer);for(const e of ['loadeddata','canplay','seeked'])media.removeEventListener(e,check);
+   media.removeEventListener('error',fail);error?reject(error):resolve();
+  }
+  for(const e of ['loadeddata','canplay','seeked'])media.addEventListener(e,check);
+  media.addEventListener('error',fail);check();
+ });
+}
+function painted(){return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));}
+async function resumeMedia(){
+ const token=++epoch;phase='preparing';ui();
+ const audioPosition=audio.currentTime,videoPosition=video.currentTime;
+ try{
+  // Both streams must be ready before either is allowed to start.
+  await Promise.all([mediaReady(audio,3),mediaReady(video,2)]);
+  await painted();
+  if(token!==epoch)return;
+  if(document.hidden){pause('background_pause');return;}
+  record('media_ready',{audioReadyState:audio.readyState,videoReadyState:video.readyState,videoSeconds:video.currentTime});
+  // The decoded next shot is already paintable. Reveal it before requesting sound.
+  cover.hidden=true;record('freeze_cover_removed',{videoSeconds:video.currentTime,intentionalCut:part>0});
+  phase='starting';ui();
+  
+  await Promise.all([video.play(),audio.play()]);
+  if(token!==epoch)return;
+  phase='playing';record('av_started',{videoSeconds:video.currentTime});status('');ui();
+ }catch(error){
+  if(token!==epoch)return;
+  stop();phase='paused';previousPhase='playing';
+  if(audio.readyState>=1)audio.currentTime=audioPosition;
+  if(video.readyState>=1)video.currentTime=videoPosition;
+  record('playback_blocked',{reason:String(error)});ui();status('素材尚未就绪，请点继续重试。');
+ }
+}
+function currentScreen(){
+ const list=segment().captions;let item=list[0];for(const c of list)if(audio.currentTime>=c.start)item=c;return item;
+}
+function visualSource(item){return item.video||src('video');}
+function videoPosition(item){return item.video?(item.mediaIn||0)+Math.max(0,audio.currentTime-item.start):audio.currentTime;}
+async function switchVisual(item){
+ const token=++epoch;preserve();stop();visualScreen=item.id;video.src=visualSource(item);loadedVideo=video.src;video.load();
+ await mediaReady(video,2);if(token!==epoch)return;video.currentTime=videoPosition(item);await resumeMedia();
+}
+function updateCaption(){
+ const list=segment().captions;
+ let current=list[0];for(const c of list)if(audio.currentTime>=c.start)current=c;
+ if(captionId!==current.id){captionId=current.id;visualScreen=current.id;$('overlay').textContent=current.overlay||'';$('caption').textContent=current.text;$('position').textContent=current.id;record('caption_shown',{boundaryStatus:segment().timingStatus});}
+}
+async function enter(){
+ stop();phase='preparing';epoch++;captionId='';pendingStation=false;
+ const first=segment().captions[0];
+ video.src=visualSource(first);loadedVideo=video.src;video.load();audio.src=src('audio');audio.load();
+ 
+ record('segment_enter',{sourceVideo:segment().video,visualStatus:segment().visualStatus});
+ updateCaption();await resumeMedia();
+}
+function nextSegment(){
+ if(part+1>=config.segments.length){finish();return;}
+ preserve();part++;enter();
+}
+function finish(){
+ stop();phase='complete';record('sample_complete',{embeddedAudioSeconds:config.segments.reduce((a,s)=>a+s.duration,0)});
+ status('本轮已结束。');ui();
+}
+let responses=[],currentQuestion=null,pendingRecovery=null;
+const sensoryOptions=['看到的样子','听到的声音','手上的感觉','离你多远','说不上'];
+const clarityOptions=['很清楚','有点模糊','在变化','看不清'];
+function stationNumber(){
+ return config.segments.slice(0,part+1).filter(s=>s.station).length;
+}
+function prepareQuestion(){
+ const number=stationNumber();
+ if(currentQuestion&&currentQuestion.stationNumber===number&&!choiceResolved)return;
+ const first=responses.find(r=>r.stationNumber===1);
+ let branch=null,type='domain',prompt=config.group==='R'?'想到那时的你，最先浮现的可能是——':'此刻，你最先注意到的可能是——';
+ let texts=config.options.slice(),domain=null;
+ if(number===2){
+  if(first&&first.answerStatus==='answered'&&first.choiceValue!=='没有清楚画面'){
+   domain=first.choiceValue;branch='感官追问';type='sensory';
+   prompt=config.threeLayerPrompts.sensoryTemplate.replace('{领域}',domain);texts=sensoryOptions.slice();
+  }else{
+   branch=first&&first.answerStatus==='answered'?'无清楚画面后重选领域':'超时后重选领域';
+   type='domain_reselect';prompt=config.threeLayerPrompts.reselect;
+  }
+ }else if(number===3){type='clarity';prompt=config.threeLayerPrompts.clarity;texts=clarityOptions.slice();}
+ currentQuestion={group:config.group,stationNumber:number,station:['P02','P06','P10'][number-1],prompt,
+  options:texts.map((text,i)=>({id:type.toUpperCase()+'_'+(i+1),text})),questionType:type,branchType:branch,
+  initialDomain:domain,shownAtISO:null,shownAtMonotonicMs:null,analysisUse:number===1?'per_protocol':'descriptive_only'};
+ $('choiceTitle').textContent=prompt;
+ $('choices').replaceChildren();
+ currentQuestion.options.forEach((option,i)=>{
+  const b=document.createElement('button');b.textContent=option.text;b.onclick=()=>resolve(i);$('choices').append(b);
+ });
+}
+function markQuestionShown(){
+ currentQuestion.shownAtISO=new Date().toISOString();
+ currentQuestion.shownAtMonotonicMs=performance.now();
+}
+function saveResponse(choice){
+ const q=currentQuestion,option=choice===null?null:q.options[choice];
+ const first=responses.find(r=>r.stationNumber===1);
+ const response={...q,options:q.options.map(o=>({...o})),answeredAtISO:new Date().toISOString(),
+ answeredAtMonotonicMs:performance.now(),choiceId:option?.id||null,choiceValue:option?.text||null,
+ answerStatus:choice===null?'timeout_unselected':'answered',reactionTimeMs:Math.round(waitMs),
+ wallReactionTimeMs:Math.round(performance.now()-q.shownAtMonotonicMs),
+ firstStationOriginalAnswer:first?{choiceValue:first.choiceValue,answerStatus:first.answerStatus}:null,
+ supplementaryDomain:q.questionType==='domain_reselect'?option?.text||null:null,
+ sensoryValue:q.questionType==='sensory'?option?.text||null:null,
+ clarityValue:q.questionType==='clarity'?option?.text||null:null,
+ audioResumedAtISO:null,audioResumedAtMonotonicMs:null,
+ timeoutPolicy:config.backgroundWaitPolicy,timeoutPolicyApproved:false};
+ responses.push(response);pendingRecovery=response;
+ record(choice===null?'choice_timeout':'choice_clicked',{response});
+}
+function recordAudioRecovery(){
+ if(!pendingRecovery)return;
+ pendingRecovery.audioResumedAtISO=new Date().toISOString();
+ pendingRecovery.audioResumedAtMonotonicMs=performance.now();
+ record('station_audio_resumed',{station:pendingRecovery.station,stationNumber:pendingRecovery.stationNumber,
+  resumedAtISO:pendingRecovery.audioResumedAtISO,resumedAtMonotonicMs:pendingRecovery.audioResumedAtMonotonicMs});
+ pendingRecovery=null;
+}
+function recordAbandonedResponse(){
+ if(!currentQuestion.shownAtISO)return;
+ responses.push({...currentQuestion,answerStatus:'abandoned',choiceId:null,choiceValue:null,
+ reactionTimeMs:Math.round(waitMs),answeredAtISO:null,answeredAtMonotonicMs:null,
+ sensoryValue:null,supplementaryDomain:null,clarityValue:null,audioResumedAtISO:null,audioResumedAtMonotonicMs:null});
+}
+
+async function revealChoices(){
+ prepareQuestion();phase='revealing';ui();exposed=false;
+ $('choices').querySelectorAll('button').forEach(b=>b.disabled=true);
+ const token=epoch;
+ await painted();
+ if(token!==epoch||phase!=='revealing')return;
+ phase='waiting';exposed=true;waitMs=0;waitMark=performance.now();choiceResolved=false;
+ $('choices').querySelectorAll('button').forEach(b=>b.disabled=false);
+ markQuestionShown();record('options_shown',{presentation:'after_two_animation_frames',question:currentQuestion});
+ $('choiceTitle').focus({preventScroll:true});ui();
+}
+async function freezeAtStation(){
+ if(pendingStation)return;pendingStation=true;phase='revealing';
+ const token=epoch;preserve();stop();
+ const item=currentScreen();
+ if(item.freeze){
+  const image=new Image();image.src=item.freeze;
+  try{await image.decode();if(token!==epoch)return;ctx.drawImage(image,0,0,cover.width,cover.height);cover.hidden=false;}
+  catch(error){record('freeze_image_error',{reason:String(error)});}
+ }
+ if(token===epoch)revealChoices();
+}
+function ended(){
+ if(!['playing','starting'].includes(phase))return;
+ // The director's file contains the approved inter-screen pauses and a short end guard.
+ stop();record('audio_segment_ended');
+ if(segment().station){freezeAtStation();}
+ else nextSegment();
+}
+function resolve(choice){
+ if(phase!=='waiting'||!exposed||choiceResolved)return;
+ choiceResolved=true;tickWait();saveResponse(choice);
+ phase='preparing';ui();preserve();nextSegment();
+}
+$('pause').onclick=()=>{
+ if(phase!=='paused'){pause();return;}
+ record('resume_requested');
+ if(document.hidden)return;
+ if(previousPhase==='revealing'){revealChoices();return;}
+ if(previousPhase==='waiting'){
+  if(!wallPaused)waitMark=performance.now();
+  tickWait();phase='waiting';ui();
+  if(waitMs>=config.timeoutSeconds*1000)resolve(null);
+  else status('');
+ }else resumeMedia();
+};
+$('exit').onclick=()=>{
+ if(!active())return;
+ if(phase==='waiting')tickWait();
+ if(currentQuestion&&!responses.some(r=>r.station===currentQuestion.station)){recordAbandonedResponse();}
+ record('exit',{waitMs:Math.round(waitMs)});epoch++;stop();phase='exited';ui();status('已退出本次试播。');
+};
+$('start').onclick=async()=>{
+ if(active())return;
+ if(config.backgroundWaitPolicy==='unconfirmed'){
+  $('settings').open=true;status('请先选择本轮测试的后台等待策略，两种方案均待研究者审定。');return;
+ }
+ room.pause();room.currentTime=0;fxFailed=false;epoch++;events=[];responses=[];currentQuestion=null;pendingRecovery=null;part=0;waitMs=0;waitMark=null;choiceResolved=false;cover.hidden=true;
+ record('sample_start',{version:config.version,audioVersion:config.audioVersion,pauseHandling:config.pauseHandling,
+  environmentEnabled:soundEnabled,environmentVersion:config.environmentVersion,timeoutPolicy:config.backgroundWaitPolicy,timeoutPolicyApproved:false,importedMedia:Array.from(fileRecords.entries())});
+ $('settings').open=false;await enter();
+};
+$('policy').onchange=()=>{
+ if(active()){$('policy').value=config.backgroundWaitPolicy;status('请退出后再改测试策略。');return;}
+ config.backgroundWaitPolicy=$('policy').value;
+};
+$('export').onclick=()=>{
+ const url=URL.createObjectURL(new Blob([JSON.stringify({version:config.version,interactionVersion:config.interactionVersion,analysisUse:config.analysisUse,config,responses,events},null,2)],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download='S组_v0.4.1_'+Date.now()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);
+};
+function segmentLabel(s){return s.captions.map(c=>c.id).join('—');}
+for(let i=0;i<config.segments.length;i++){
+ const row=document.createElement('fieldset');const legend=document.createElement('legend');legend.textContent=segmentLabel(config.segments[i]);row.append(legend);
+ for(const kind of ['video','audio']){
+  const label=document.createElement('label');label.textContent=kind==='video'?'替换本段画面轨':'替换本段导演音轨（含屏间停顿）';
+  const input=document.createElement('input');input.type='file';input.accept=kind==='video'?'video/*':'audio/*';
+  input.onchange=()=>{
+   if(active()){input.value='';status('请先退出本轮。');return;}
+   const file=input.files[0];if(!file)return;
+   const key=i+'_'+kind;if(imported.has(key))URL.revokeObjectURL(imported.get(key));
+   imported.set(key,URL.createObjectURL(file));fileRecords.set(key,{name:file.name,size:file.size,lastModified:file.lastModified});
+   status(kind==='audio'?'已替换音轨，请同步核对配置中的字幕屏界。':'已替换本段画面轨，下一轮将使用新画面。');
+  };
+  label.append(input);row.append(label);
+ }
+ $('inputs').append(row);
+}
+audio.addEventListener('playing',()=>{
+ if(['starting','playing'].includes(phase)){
+  recordAudioRecovery();record('audio_playing',{videoSeconds:video.currentTime});
+ }
+});
+audio.addEventListener('ended',ended);
+for(const media of [audio,video]){
+ media.addEventListener('waiting',()=>{if(phase==='playing'&&!media.seeking)pause('buffer_pause');});
+ media.addEventListener('error',()=>{if(active())pause('media_error');status('素材无法读取，请检查文件。');});
+}
+video.addEventListener('ended',()=>{
+ if(phase!=='playing'||audio.ended)return;
+ const item=currentScreen();
+ const requiredDuration=item.video?(item.mediaIn||0)+(item.end-item.start):audio.duration;
+ const remaining=(item.video?item.end:audio.duration)-audio.currentTime;
+ const assetShortfall=requiredDuration-video.duration;
+ // A video clock may reach its end slightly ahead of the audio clock.
+ // Verify the asset length before treating that ordinary drift as missing footage.
+ if(Number.isFinite(assetShortfall)&&assetShortfall>.12){
+  record('video_asset_short',{requiredDuration,actualDuration:video.duration,assetShortfall,remaining});
+  pause('video_too_short');status('画面素材不完整，请打开本轮完整审片包。');
+ }else{
+  record('video_tail_hold',{requiredDuration,actualDuration:video.duration,assetShortfall,remaining});
+  // Keep the decoded final frame; audio ended remains the sole transition trigger.
+ }
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pause('background_pause');});
+window.addEventListener('pagehide',()=>pause('pagehide_pause'));
+function frame(){
+ if(!document.hidden){
+  if(phase==='playing'){
+   const item=currentScreen();
+   if(item.id!==visualScreen&&video.src!==new URL(visualSource(item),location.href).href){
+    phase='preparing';switchVisual(item).then(updateCaption).catch(error=>{pause('media_error');status(String(error));});
+   }else{
+    updateCaption();
+    
+    const target=videoPosition(item);
+    if(!video.seeking&&!video.ended&&Math.abs(video.currentTime-target)>.2)video.currentTime=target;
+    if(segment().station&&Number.isFinite(segment().stationAt)&&audio.currentTime>=segment().stationAt){
+     audio.currentTime=segment().stationAt;phase='starting';freezeAtStation();
+    }
+   }
+  }else if(phase==='waiting'){tickWait();if(waitMs>=config.timeoutSeconds*1000)resolve(null);}
+ }
+ requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+function placeCaption(){const stage=document.querySelector('.stage').getBoundingClientRect();const main=document.querySelector('main').getBoundingClientRect();const pictureHeight=Math.min(stage.height,stage.width*4/3);document.querySelector('#caption').style.bottom=(main.height-(stage.top-main.top)-(stage.height+pictureHeight)/2+16)+'px'}window.addEventListener('resize',()=>requestAnimationFrame(placeCaption));if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>requestAnimationFrame(placeCaption));placeCaption();
+ui();
+
+const demonstration=new URLSearchParams(location.search).get('demo');
+if(['concrete','unclear','timeout'].includes(demonstration)){
+ const tools=document.createElement('div');tools.id='demoTools';
+ const note=document.createElement('span');
+ note.textContent={concrete:'演示：第一站选具体领域，再选感官及清楚程度。',unclear:'演示：第一站选没有清楚画面，第二站重选领域。',timeout:'演示：第一站实际等20秒不选，第二站重选领域。'}[demonstration];
+ const jump=document.createElement('button');jump.textContent='审片跳到下一选择点';
+ jump.onclick=async()=>{
+  if(!['playing','waiting'].includes(phase))return;
+  const target=config.segments.findIndex((s,i)=>s.station&&(i>part||(i===part&&phase==='playing')));
+  if(target<0)return;
+  if(phase==='waiting'){status('请先完成当前选择。');return;}
+  record('review_jump',{targetSegment:target});
+  if(target!==part){preserve();part=target;await enter();}
+  if(phase!=='playing')return;
+  const end=segment().stationAt??segment().duration;
+  audio.currentTime=Math.max(0,end-.12);video.currentTime=audio.currentTime;
+ };
+ tools.append(note,document.createElement('br'),jump);document.querySelector('main').append(tools);
+}
+</script></html>
+<script>
+(()=>{
+ const root=document.querySelector('main'),stage=document.querySelector('.stage'),media=document.getElementById('video');
+ function alignVideoOverlays(){
+  const rect=media.getBoundingClientRect(),parent=root.getBoundingClientRect();
+  const ratio=(media.videoWidth&&media.videoHeight)?media.videoWidth/media.videoHeight:3/4;
+  let width=rect.width,height=width/ratio;
+  if(height>rect.height){height=rect.height;width=height*ratio;}
+  const left=rect.left+(rect.width-width)/2;
+  root.style.setProperty('--frame-center-x',(left-parent.left+width*.51)+'px');
+  root.style.setProperty('--frame-safe-width',(width*.88)+'px');
+ }
+ media.addEventListener('loadedmetadata',alignVideoOverlays);
+ window.addEventListener('resize',alignVideoOverlays);
+ window.addEventListener('orientationchange',()=>requestAnimationFrame(alignVideoOverlays));
+ if(window.visualViewport)window.visualViewport.addEventListener('resize',alignVideoOverlays);
+ if(window.ResizeObserver){const observer=new ResizeObserver(alignVideoOverlays);observer.observe(stage);observer.observe(root);}
+ alignVideoOverlays();
+})();
+</script>
+<script src="bridge.js"></script>
