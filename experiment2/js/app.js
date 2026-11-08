@@ -241,7 +241,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
     }
     state.videoInterrupted = true; await checkpoint('before_video');
     const reuse=!common&&retainedFrame&&retainedFrame.isConnected;
-    if(!reuse)ui.main.innerHTML = '<iframe id="practiceFrame" title="互动练习" allow="autoplay" src="player/' + group + '.html?embedded=1&build=20261109-entry1"></iframe>';
+    if(!reuse)ui.main.innerHTML = '<iframe id="practiceFrame" title="互动练习" allow="autoplay" src="player/' + group + '.html?embedded=1&build=20261109-shared1"></iframe>';
     playerFrame = reuse?retainedFrame:$('practiceFrame');retainedFrame=null;playerNonce=uuid();
     return new Promise((resolve, reject) => {
       let closed = false;
@@ -550,6 +550,10 @@ window.LG2_RUN_EXPERIMENT = async function () {
         restart.onclick=()=>{const url=new URL(location.href);url.searchParams.set('new','1');location.assign(url);};
         $('finishActions').append(restart);
       }
+      if (!preview && cfg.PLATFORM === 'offline' && !cfg.PID_PARAMS.some(key => query.get(key))) {
+        const next = document.createElement('button');next.textContent='下一位参加者';next.id='nextOfflineParticipant';
+        next.onclick=()=>location.reload();$('finishActions').append(next);
+      }
       if (preview || result.pending) {
         const exportButton = document.createElement('button'); exportButton.textContent = '保存本次作答副本';
         exportButton.onclick = async () => ui.download({ ...snapshot(), pendingFiles: (await storage.all('queue')).filter(q => q.sessionKey === state.key) }, 'LG2_' + state.id + '.json');
@@ -631,10 +635,18 @@ window.LG2_RUN_EXPERIMENT = async function () {
     if (!preview && !pid && cfg.PLATFORM === 'offline') {
       const offlineKey = 'LG2_offline_pid_' + cfg.PHASE;
       const previous = localStorage.getItem(offlineKey) || '';
-      await ui.form('参加互动练习',
-        '<p>欢迎参加。点击下方按钮开始互动练习。</p>',
-        { submit: '开始参加' });
-      pid = previous || 'OFFLINE-' + uuid();
+      const priorKey = previous ? localStorage.getItem('LG2_session_' + cfg.PHASE + '_' + await core.hash(previous)) : null;
+      const priorState = priorKey ? await storage.read('states', priorKey) : null;
+      let reuse = false;
+      if (priorState) {
+        const answer = await ui.choice('参加互动练习',
+          '<p>这台设备可以供不同参加者使用。新参加者请开始新的作答；原作答会保留。</p>',
+          priorState.completion ? ['新参加者开始', '查看自己的上次完成记录'] : ['继续自己的上次作答', '新参加者开始']);
+        reuse = priorState.completion ? answer.choice === 1 : answer.choice === 0;
+      } else {
+        await ui.form('参加互动练习', '<p>欢迎参加。点击下方按钮开始互动练习。</p>', { submit: '开始参加' });
+      }
+      pid = reuse ? previous : 'OFFLINE-' + uuid();
       localStorage.setItem(offlineKey, pid);
     }
     if (!preview && !pid) {
