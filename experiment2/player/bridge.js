@@ -2,26 +2,6 @@
   const expectedOrigin = location.protocol === 'file:' ? 'null' : location.origin;
   let nonce = null, parameters = null, initialized = false, completed = false;
   let shownYear = null;
-  // Fetch the next media during the current segment, never by playing hidden audio.
-  const preloaded = window.LG2_PRELOADED = new Map(), pendingLoads = new Map();
-  function preloadSegment(segment) {
-    if (!segment || location.protocol === 'file:') return;
-    for (const path of [segment.audio, segment.video]) {
-      if (!path || preloaded.has(path) || pendingLoads.has(path)) continue;
-      const job = fetch(path).then(response => {
-        if (!response.ok) throw Error('HTTP ' + response.status);
-        return response.blob();
-      }).then(blob => {
-        preloaded.set(path, URL.createObjectURL(blob));
-        record('media_preloaded', { source: path, bytes: blob.size });
-      }).catch(error => record('media_preload_failed', { source: path, reason: String(error) }));
-      pendingLoads.set(path, job);
-    }
-    for (const caption of segment.captions || []) if (caption.freeze) {
-      const image = new Image(); image.src = caption.freeze;
-    }
-  }
-
   function payload() {
     return {
       mediaVersion: config.version, interactionVersion: config.interactionVersion,
@@ -41,7 +21,6 @@
   record = function (type, details = {}) {
     if (type === 'sample_start') details = { ...details, timeoutPolicyApproved: !!config.timeoutPolicyApproved };
     originalRecord(type, details);
-    if (type === 'segment_enter') preloadSegment(config.segments[part + 1]);
     if (type === 'choice_clicked' || type === 'choice_timeout') send('response', details.response || details);
     if (type === 'sample_complete' && !completed) {
       completed = true; stop(); room.pause(); send('complete');
@@ -87,8 +66,6 @@
       shownYear=null;initialStart();
     }else if (e.data.type === 'configure' && !initialized) {
       initialized = true; nonce = e.data.nonce; parameters = e.data.parameters;
-      (e.data.routePreloads || []).forEach(preloadSegment);
-      preloadSegment(config.segments[0]);
       config.group = e.data.group; config.timeoutPolicyApproved = e.data.timeoutPolicyApproved;
       config.backgroundWaitPolicy = e.data.timeoutPolicy;
       start.textContent = config.group === 'common' ? '开始观看' : '继续练习';

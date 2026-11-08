@@ -40,10 +40,11 @@ function ambientFail(kind,e){if(kind==='room')roomFailed=true;else fxFailed=true
 room.onerror=()=>ambientFail('room','load');fx.onerror=()=>ambientFail('fx','load');
 function ambientSync(){if(!soundEnabled||roomFailed)return;if(!segment().environmentRoom){room.pause();return;}if(['idle','paused','complete','exited'].includes(phase)){room.pause();}else if(room.paused){room.play().catch(e=>ambientFail('room',e));}}
 const imported=new Map(),fileRecords=new Map();
+let retryMedia=false;
 let part=0,phase='idle',previousPhase=null,epoch=0,events=[],choiceResolved=false;
 let waitMs=0,waitMark=null,wallPaused=false,exposed=false,captionId='',visualScreen=null,loadedVideo='',pendingStation=false;
 const segment=()=>config.segments[part];
-const src=kind=>imported.get(part+'_'+kind)||window.LG2_PRELOADED?.get(segment()[kind])||segment()[kind];
+const src=kind=>imported.get(part+'_'+kind)||segment()[kind];
 function record(type,details={}){
  events.push({group:config.group,type,part:segment().id,screen:captionId,audioSeconds:audio.currentTime||0,
  monotonicMs:performance.now(),atISO:new Date().toISOString(),...details});
@@ -78,6 +79,7 @@ function pause(reason='manual_pause'){
  epoch++;stop();phase='paused';record(reason);ui();status('已暂停，点继续接着看。');
 }
 function mediaReady(media,minimum){
+ if(media.error)return Promise.reject(new Error('素材无法加载：'+media.error.code));
  if(media.readyState>=minimum&&!media.seeking)return Promise.resolve();
  return new Promise((resolve,reject)=>{
   const timer=setTimeout(()=>finish(new Error('素材加载超时')),15000);
@@ -96,6 +98,15 @@ async function resumeMedia(){
  const token=++epoch;phase='preparing';ui();
  const audioPosition=audio.currentTime,videoPosition=video.currentTime;
  try{
+  if(retryMedia){
+   retryMedia=false;
+   video.load();audio.load();
+   await Promise.all([mediaReady(audio,2),mediaReady(video,2)]);
+   if(token!==epoch)return;
+   if(audioPosition>0)audio.currentTime=audioPosition;
+   if(videoPosition>0)video.currentTime=videoPosition;
+   record('media_reload_retry',{audioPosition,videoPosition});
+  }
   // Both streams must be ready before either is allowed to start.
   await Promise.all([mediaReady(audio,3),mediaReady(video,2)]);
   await painted();
@@ -111,6 +122,7 @@ async function resumeMedia(){
   phase='playing';record('av_started',{videoSeconds:video.currentTime});status('');ui();
  }catch(error){
   if(token!==epoch)return;
+  retryMedia=error.name!=='NotAllowedError';
   stop();phase='paused';previousPhase='playing';
   if(audio.readyState>=1)audio.currentTime=audioPosition;
   if(video.readyState>=1)video.currentTime=videoPosition;
@@ -132,7 +144,7 @@ function updateCaption(){
  if(captionId!==current.id){captionId=current.id;visualScreen=current.id;$('overlay').textContent=current.overlay||'';$('caption').textContent=current.text;$('position').textContent=current.id;record('caption_shown',{boundaryStatus:segment().timingStatus});}
 }
 async function enter(){
- stop();phase='preparing';epoch++;captionId='';pendingStation=false;
+ stop();retryMedia=false;phase='preparing';epoch++;captionId='';pendingStation=false;
  const first=segment().captions[0];
  video.src=visualSource(first);loadedVideo=video.src;video.load();audio.src=src('audio');audio.load();
  
@@ -307,7 +319,7 @@ audio.addEventListener('playing',()=>{
 audio.addEventListener('ended',ended);
 for(const media of [audio,video]){
  media.addEventListener('waiting',()=>{if(phase==='playing'&&!media.seeking)pause('buffer_pause');});
- media.addEventListener('error',()=>{if(active())pause('media_error');status('素材无法读取，请检查文件。');});
+ media.addEventListener('error',()=>{retryMedia=true;if(active())pause('media_error');status('素材无法读取，请检查文件。');});
 }
 video.addEventListener('ended',()=>{
  if(phase!=='playing'||audio.ended)return;
@@ -390,4 +402,4 @@ if(['concrete','unclear','timeout'].includes(demonstration)){
  alignVideoOverlays();
 })();
 </script>
-<script src="bridge.js?v=20261108-preload1"></script>
+<script src="bridge.js?v=20261108-playfix1"></script>
