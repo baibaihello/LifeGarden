@@ -609,8 +609,19 @@ window.LG2_RUN_EXPERIMENT = async function () {
       cfg.BACKGROUND_WAIT_POLICY = cfg.BACKGROUND_WAIT_POLICY === 'unconfirmed' ? 'foreground_active' : cfg.BACKGROUND_WAIT_POLICY;
     }
     let pid = cfg.PID_PARAMS.map(key => query.get(key)).find(Boolean);
-    if(!preview&&!pid&&cfg.PLATFORM==='offline'){
-      const answer=await ui.form('线下参加编号',field('participantId','请输入研究者提供的参加编号','text',{maxlength:100}));pid=answer.values.participantId.trim();
+    // A bare link is the offline recruitment entrance; explicit platform links still require their ID.
+    if (!preview && !pid && !query.has('platform')) cfg.PLATFORM = 'offline';
+    if (!preview && !pid && cfg.PLATFORM === 'offline') {
+      const offlineKey = 'LG2_offline_pid_' + cfg.PHASE;
+      const previous = localStorage.getItem(offlineKey) || '';
+      const answer = await ui.form('参加互动练习',
+        '<p>欢迎参加。点击下方按钮开始；如果研究者给了你参加编号，可以在这里填写。</p>' +
+        '<label class="lg-q field">参加编号（选填）<input name="participantId" type="text" maxlength="100" value="' + escape(previous) + '"></label>' +
+        '<p>没有编号可直接开始，系统会自动分配。请勿填写姓名或手机号。</p>' +
+        '<p><a href="index.html?mode=preview">研究者演练（不上传、不占分组号）</a></p>',
+        { submit: '开始参加' });
+      pid = answer.values.participantId.trim() || previous || 'OFFLINE-' + uuid();
+      localStorage.setItem(offlineKey, pid);
     }
     if (!preview && !pid) {
       ui.mount('请从招募平台进入', '<p>链接中未收到参与者编号，请回到招募平台重新进入。</p>');
