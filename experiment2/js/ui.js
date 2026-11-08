@@ -19,9 +19,15 @@ window.LG2UI = (() => {
         '" data-required-touch="1" aria-label="' + escape(label) + '"><output>尚未选择</output></div></fieldset>';
     }
     if (type === 'likert') {
-      return field(name, label, 'radio', { values: Array.from({ length: options.max || 7 }, (_, i) => ({
-        value: i + 1, text: (i + 1) + (i === 0 ? ' · ' + (options.low || '完全不符合') : i === (options.max || 7) - 1 ? ' · ' + (options.high || '完全符合') : '')
-      })) });
+      const max = options.max || 7;
+      const low = options.low || '完全不符合', high = options.high || '完全符合';
+      // Reuse Study 1's horizontal numeric choices and separate endpoint labels.
+      return '<fieldset class="likert-question"><legend>' + label + '</legend>' +
+        '<div class="ends likert-ends"><span>1 ' + escape(low) + '</span><span>' + max + ' ' + escape(high) + '</span></div>' +
+        '<div class="likert" style="--steps:' + max + '">' + Array.from({ length: max }, (_, i) =>
+          '<label><input required type="radio" name="' + escape(name) + '" value="' + (i + 1) +
+          '" aria-label="' + (i + 1) + (i === 0 ? ' ' + escape(low) : i === max - 1 ? ' ' + escape(high) : '') + '"><span>' + (i + 1) + '</span></label>'
+        ).join('') + '</div></fieldset>';
     }
     if (type === 'textarea') return '<label class="field">' + label + '<textarea name="' + name + '" rows="4" maxlength="5000"></textarea></label>';
     const attrs = Object.entries(options).map(([k, v]) => k + '="' + escape(v) + '"').join(' ');

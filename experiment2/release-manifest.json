@@ -1,5 +1,5 @@
 {
-  "materialHash": "3cfcb14e007deafc2ab4f12cc6ae86525adc476fe0342faef3bfc9408f44fad2",
+  "materialHash": "76dc6901b82a2956a38fcfbad42fbdf6e663399a88741a1fd2771332d869e038",
   "code": {
     "credamo.html": "0dce737e3a9ec28b4ff994a2849a7826c9bbf693fa2931e7430716a28687e28a",
     "index.html": "c26f179add4883e58c2c17cfdfd44f1e0184d50f88998f779e7400ac1beb426b",
@@ -11,14 +11,14 @@
     "js/media-configs.js": "9f3b2de85e7b09accf07f5fb8cf2fc0917faa307de01ecb33be33698def1e6cf",
     "js/recording.js": "d65f3b6e710e14a7fbd248ce80973fb7bd9dc1e4ef8257308497ced9fda16eae",
     "js/storage.js": "9d2bc08de4b828fe97ffbbce3c1ec43a1aca4a9c992c80fb24a7d24c505329f7",
-    "js/ui.js": "74e033eb5ef5e09880da0df9955a82c704710332a0742330abc252b0cdf1ef7d",
+    "js/ui.js": "cffd915bca804c1bb6ce41b463881c6e3720e571ce5f3a757b3d7782afd8cd39",
     "naodao.html": "5d8c051bf41347661e5ca26c80f4f2dd69d269606d402bd98abf6dd6ef0949ab",
     "offline.html": "73b5bd0d9db67219afb671a9d0f1d3556f901d57799cb2be45bcf3b795ce0804",
     "player/R.html": "321968154525c50b9f71ad5a31ebe2200658edfbf61588ec443801e09ca961dc",
     "player/S.html": "94fdc250c42b644e8de422e47d9f5518b80c8027562c9080b00a5a3dd805fe3d",
     "player/bridge.js": "d5d432e827c9557a16f1e9421f97a1eed82f389e48375bafcfb2bb8e1ac42efd",
     "player/common.html": "6f062755ebd23f49baecc8f59ad4b9ae31b941888ce49ed52932f1faf6147fe1",
-    "styles.css": "7d3841fa28664f876cf1fc14858cc5d34b7a2f6df0aae19b2a104703fbf77167",
+    "styles.css": "ef5d61ca473a73c38e1c868c39bca1f388d945aed89c104c7c6833055ac7180b",
     "vendor/jspsych.js": "0715e5c588db45d4cda0ad8f4a22e1e6faf9ee75bcb863f9c0afa2a35ba78eb7"
   },
   "media": {

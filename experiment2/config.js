@@ -1,5 +1,5 @@
 window.LG2_CONFIG = {
-  VERSION: 'experiment2-full-v1.0.2',
+  VERSION: 'experiment2-full-v1.0.3',
   PROTOCOL: 'v0.9 draft + approved v0.9C text / three-layer choices / v0.16 media',
   MODE: 'review',
   RUN_MODE: 'prerun', // 技术预跑：仅本地保存，不占正式分组，不发送短信
