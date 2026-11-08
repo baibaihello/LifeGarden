@@ -241,7 +241,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
     }
     state.videoInterrupted = true; await checkpoint('before_video');
     const reuse=!common&&retainedFrame&&retainedFrame.isConnected;
-    if(!reuse)ui.main.innerHTML = '<iframe id="practiceFrame" title="互动练习" allow="autoplay" src="player/' + group + '.html?embedded=1&build=20261108-sync2"></iframe>';
+    if(!reuse)ui.main.innerHTML = '<iframe id="practiceFrame" title="互动练习" allow="autoplay" src="player/' + group + '.html?embedded=1&build=20261109-entry1"></iframe>';
     playerFrame = reuse?retainedFrame:$('practiceFrame');retainedFrame=null;playerNonce=uuid();
     return new Promise((resolve, reject) => {
       let closed = false;
@@ -616,7 +616,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
     await storage.open();
     if (!preview && releaseMissing().length) {
       ui.mount('研究入口准备中', '<p>这个入口尚未开放正式参加。请联系研究者。</p><details><summary>部署配置检查</summary><p>' +
-        escape(releaseMissing().join('、')) + '</p></details><a href="index.html?mode=preview">研究者本地演练</a>');
+        escape(releaseMissing().join('、')) + '</p></details>');
       $('withdraw').disabled = true;
       return;
     }
@@ -632,14 +632,13 @@ window.LG2_RUN_EXPERIMENT = async function () {
       const offlineKey = 'LG2_offline_pid_' + cfg.PHASE;
       const previous = localStorage.getItem(offlineKey) || '';
       await ui.form('参加互动练习',
-        '<p>欢迎参加。点击下方按钮开始互动练习。</p>' +
-        '<p><a href="index.html?mode=preview&v=20261108-retry1">研究者演练（不上传、不占分组号）</a></p>',
+        '<p>欢迎参加。点击下方按钮开始互动练习。</p>',
         { submit: '开始参加' });
       pid = previous || 'OFFLINE-' + uuid();
       localStorage.setItem(offlineKey, pid);
     }
     if (!preview && !pid) {
-      ui.mount('请从招募平台进入', '<p>链接中未收到参与者编号。通过脑岛或见数参加，请回到招募平台重新进入。</p><p>如果你是线下招募的参加者，请使用下方入口。</p><p><a href="index.html?platform=offline&v=20261108-retry1">线下参加入口</a></p><p><a href="index.html?mode=preview&v=20261108-retry1">研究者演练（不上传、不占号）</a></p>');
+      ui.mount('请从招募平台进入', '<p>链接中未收到参与者编号。通过脑岛或见数参加，请回到招募平台重新进入。</p><p>如果你是线下招募的参加者，请使用下方入口。</p><p><a href="index.html?platform=offline&v=20261108-retry1">线下参加入口</a></p>');
       return;
     }
     let pointer = preview ? 'LG2_preview_session' : 'LG2_session_' + cfg.PHASE + '_' + await core.hash(pid);
