@@ -241,7 +241,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
     }
     state.videoInterrupted = true; await checkpoint('before_video');
     const reuse=!common&&retainedFrame&&retainedFrame.isConnected;
-    if(!reuse)ui.main.innerHTML = '<iframe id="practiceFrame" title="互动练习" allow="autoplay" src="player/' + group + '.html?embedded=1&build=20261108-light1"></iframe>';
+    if(!reuse)ui.main.innerHTML = '<iframe id="practiceFrame" title="互动练习" allow="autoplay" src="player/' + group + '.html?embedded=1&build=20261108-sync2"></iframe>';
     playerFrame = reuse?retainedFrame:$('practiceFrame');retainedFrame=null;playerNonce=uuid();
     return new Promise((resolve, reject) => {
       let closed = false;
