@@ -614,17 +614,15 @@ window.LG2_RUN_EXPERIMENT = async function () {
     if (!preview && !pid && cfg.PLATFORM === 'offline') {
       const offlineKey = 'LG2_offline_pid_' + cfg.PHASE;
       const previous = localStorage.getItem(offlineKey) || '';
-      const answer = await ui.form('参加互动练习',
-        '<p>欢迎参加。点击下方按钮开始；如果研究者给了你参加编号，可以在这里填写。</p>' +
-        '<label class="lg-q field">参加编号（选填）<input name="participantId" type="text" maxlength="100" value="' + escape(previous) + '"></label>' +
-        '<p>没有编号可直接开始，系统会自动分配。请勿填写姓名或手机号。</p>' +
-        '<p><a href="index.html?mode=preview">研究者演练（不上传、不占分组号）</a></p>',
+      await ui.form('参加互动练习',
+        '<p>欢迎参加。点击下方按钮开始互动练习。</p>' +
+        '<p><a href="index.html?mode=preview&v=20261108-offline3">研究者演练（不上传、不占分组号）</a></p>',
         { submit: '开始参加' });
-      pid = answer.values.participantId.trim() || previous || 'OFFLINE-' + uuid();
+      pid = previous || 'OFFLINE-' + uuid();
       localStorage.setItem(offlineKey, pid);
     }
     if (!preview && !pid) {
-      ui.mount('请从招募平台进入', '<p>链接中未收到参与者编号。通过脑岛或见数参加，请回到招募平台重新进入。</p><p>如果你是线下招募的参加者，请使用下方入口。</p><p><a href="index.html?platform=offline&v=20261108-offline2">线下参加入口</a></p><p><a href="index.html?mode=preview&v=20261108-offline2">研究者演练（不上传、不占号）</a></p>');
+      ui.mount('请从招募平台进入', '<p>链接中未收到参与者编号。通过脑岛或见数参加，请回到招募平台重新进入。</p><p>如果你是线下招募的参加者，请使用下方入口。</p><p><a href="index.html?platform=offline&v=20261108-offline3">线下参加入口</a></p><p><a href="index.html?mode=preview&v=20261108-offline3">研究者演练（不上传、不占号）</a></p>');
       return;
     }
     let pointer = preview ? 'LG2_preview_session' : 'LG2_session_' + cfg.PHASE + '_' + await core.hash(pid);
