@@ -32,7 +32,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
   function snapshot() {
     return {
       schemaVersion: 'lg2-complete-1', testData: preview, version: cfg.VERSION,
-      protocol: cfg.PROTOCOL, materialHash:window.LG2_MATERIAL_HASH, checkpointSequence:state.sequence, phase: state.phase, participantId: state.pid,
+      protocol: cfg.PROTOCOL, materialHash:window.LG2_MATERIAL_HASH, checkpointSequence:state.sequence, phase: preview ? 'PRERUN' : state.phase, participantId: state.pid,
       platform: cfg.PLATFORM, sessionId: state.id, startedAt: state.startedAt,
       assignment: state.assignment || null, design: state.design, consent: state.data.consent,
       data: state.data, events: state.events, stage: state.plan[state.cursor],
@@ -646,7 +646,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
     if (!state) {
       const id = uuid();
       state = {
-        key: 'E2-' + id, id, pid, version: cfg.VERSION, phase: cfg.PHASE,
+        key: 'E2-' + id, id, pid, version: cfg.VERSION, phase: preview ? 'PRERUN' : cfg.PHASE,
         startedAt: now(), cursor: 0, sequence: 0, plan: fullPlan.slice(), data: {}, events: [],
         design: {
           ddOrder: core.shuffle(['A', 'B']), postOrder: core.shuffle(['garden_first', 'dd_first'])[0],
