@@ -1,10 +1,10 @@
 {
-  "materialHash": "4e57e86a62f3670463282a99a6cb2695bdc246774e9d4e91d95b805b5a486ce3",
+  "materialHash": "86faed7e35de9473e0a9cadbb9bb87c36c1f687013256f0283a0630e4f775fa2",
   "code": {
     "config.PILOT.js": "88bf6048403eeb413ca993ecc62ff1faa6ed226fecd989f1be9596994f3fcf95",
     "credamo.html": "0dce737e3a9ec28b4ff994a2849a7826c9bbf693fa2931e7430716a28687e28a",
-    "index.html": "facad2060e3437c0c2cffd707676b99b8e4323a8ebab33cd766074f7abe741da",
-    "js/app.js": "c35d1463350ce821874d5732409f6bc8eb080b1d2aaa199f33b60e15c8c58dd6",
+    "index.html": "161d592ecfab8f7dddb163e53a41bfcb1e4c1b87bbc2652593339cc8f0d0cbaa",
+    "js/app.js": "8b6b958024903651e67e9d74bcd2da3bc12da8ebd4158d86e743d878c9e0ee2b",
     "js/bank.js": "c5ecaa6506b25d5aa2c8af759a4c061651591656f7d377662cf4e2d9e84a218f",
     "js/bootstrap.js": "4af190f468740e5b2cc702ffa352d5c463312d0f877524df76a5a311fe7dacec",
     "js/consent.js": "5cdf5f422ada57faa29c73866c4e8d3d301fec8247c01ac61998bed06572f4b3",
@@ -15,7 +15,7 @@
     "js/ui.js": "f0d11fcfab39dd4df4733c686b65f3ca570c1326cf5e6f0e84717d0f6ddc4440",
     "naodao.html": "5d8c051bf41347661e5ca26c80f4f2dd69d269606d402bd98abf6dd6ef0949ab",
     "offline.html": "73b5bd0d9db67219afb671a9d0f1d3556f901d57799cb2be45bcf3b795ce0804",
-    "pilot.html": "e637b47acc0e76e82012e1b089e39a6066bc936517c9b30a4891183c133a7578",
+    "pilot.html": "bae40dec3ba6b6cfca810809c2a4322eac8ae735be36f4da0c4d4ad1486c8453",
     "player/R.html": "321968154525c50b9f71ad5a31ebe2200658edfbf61588ec443801e09ca961dc",
     "player/S.html": "94fdc250c42b644e8de422e47d9f5518b80c8027562c9080b00a5a3dd805fe3d",
     "player/bridge.js": "d5d432e827c9557a16f1e9421f97a1eed82f389e48375bafcfb2bb8e1ac42efd",

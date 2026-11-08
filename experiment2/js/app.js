@@ -624,7 +624,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
       localStorage.setItem(offlineKey, pid);
     }
     if (!preview && !pid) {
-      ui.mount('请从招募平台进入', '<p>链接中未收到参与者编号，请回到招募平台重新进入。</p>');
+      ui.mount('请从招募平台进入', '<p>链接中未收到参与者编号。通过脑岛或见数参加，请回到招募平台重新进入。</p><p>如果你是线下招募的参加者，请使用下方入口。</p><p><a href="index.html?platform=offline&v=20261108-offline2">线下参加入口</a></p><p><a href="index.html?mode=preview&v=20261108-offline2">研究者演练（不上传、不占号）</a></p>');
       return;
     }
     let pointer = preview ? 'LG2_preview_session' : 'LG2_session_' + cfg.PHASE + '_' + await core.hash(pid);
