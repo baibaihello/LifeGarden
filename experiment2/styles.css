@@ -1,14 +1,83 @@
-:root{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:#263e30;background:#eef1e9;font-size:17px;line-height:1.7}
-*{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom)}button,input,textarea,select{font:inherit}button,a{touch-action:manipulation}button{min-height:46px;border:1px solid #8b9c8b;border-radius:10px;padding:10px 16px;background:#f8faf5;color:#294531;cursor:pointer}button:disabled{opacity:.5;cursor:default}button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #b18b3c;outline-offset:3px}.primary{background:#365f43;color:white;border-color:#365f43;width:100%;margin-top:14px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:740px;margin:0 auto;padding:10px 18px}.topbar span{font-size:14px}.topbar button{background:transparent;font-size:14px;min-height:44px}#app{max-width:740px;margin:0 auto;padding:0 14px}.card{background:#fffdf7;padding:24px;border:1px solid #d1d8cb;border-radius:16px;box-shadow:0 4px 18px #243c2810}.card h1{font-size:23px;font-weight:600;line-height:1.4;margin:0 0 20px;outline:none}fieldset{min-width:0;border:0;border-top:1px solid #dbe0d5;margin:20px 0;padding:14px 0 0}legend{font-weight:500;float:left;width:100%;margin-bottom:10px}legend+*{clear:both}.field{display:block;margin:16px 0}input[type=text],input[type=number],input[type=tel],textarea,select{display:block;width:100%;min-height:46px;padding:10px;border:1px solid #abb9a4;border-radius:8px;background:white;color:#263e30;margin-top:8px}textarea{resize:vertical}.option{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border:1px solid #d1dbc9;border-radius:8px;margin:7px 0;background:#f6f8f1;min-height:46px}input[type=radio],input[type=checkbox]{accent-color:#365f43;min-width:20px;width:20px;height:20px;margin-top:5px}.ends{display:flex;justify-content:space-between;gap:16px;font-size:13px}.rating-line{display:grid;grid-template-columns:1fr 85px;align-items:center;gap:14px;min-height:52px}input[type=range]{width:100%;min-height:44px;accent-color:#365f43;cursor:pointer}.rating-line output{font-size:14px}.stack{display:grid;gap:10px}.pool{position:sticky;top:0;background:#edf3e7;padding:10px;border-radius:8px;z-index:1}.pool b{font-size:26px}.allocation{display:block;border-bottom:1px solid #dde3d6;padding:15px 0}.allocation output{margin-left:12px;font-variant-numeric:tabular-nums}.tree{display:inline-block;transform-origin:bottom center;margin-right:8px}.error{color:#993f31;min-height:1em}.letter{white-space:pre-wrap;background:#f3f5ec;padding:15px;border-radius:10px;overflow-wrap:anywhere}.code{font-size:26px;letter-spacing:.07em}#previewBadge{max-width:712px;margin:0 auto 10px;padding:8px 16px;background:#f2e7be;font-size:13px}#saveStatus{max-width:712px;margin:12px auto;padding:0 16px 20px;color:#657260;font-size:12px}dialog{border:1px solid #b9c5b2;border-radius:15px;max-width:min(92vw,520px);color:#263e30;padding:22px}dialog::backdrop{background:#15231aaa}.video-active{position:fixed!important;inset:0;max-width:none!important;margin:0!important;padding:0!important;background:#d6d4cf;z-index:20}#practiceFrame{width:100%;height:100%;border:0;display:block}.recording{padding:10px;border:1px dashed #b7c7ad;margin:12px 0;border-radius:8px}.recording span{display:block;font-size:13px;margin-top:6px}.dd{font-size:22px;line-height:2}[hidden]{display:none!important}@media(max-width:420px){.card{padding:19px 16px}#app{padding:0 9px}.rating-line{grid-template-columns:1fr 70px}.topbar{padding:8px 12px}}
+/* Study 1 UI source: LifeGarden 94a08645adcfbeeea2ffa727d03c01f0c70ee4cc/index.html */
+:root{font-family:"Open Sans","Arial",sans-serif;font-size:17px;line-height:1.8}*{box-sizing:border-box}body{margin:0;padding-bottom:env(safe-area-inset-bottom)}button,input,textarea,select{font:inherit}button,a{touch-action:manipulation}button{cursor:pointer}button:disabled{cursor:default}[hidden]{display:none!important}
 
-/* v1.0.3: Study 1 horizontal Likert interaction, retaining Experiment 2 colors. */
-fieldset{margin:14px 0;padding:10px 0 4px}
-legend{margin-bottom:6px}
-.likert{display:grid;grid-template-columns:repeat(var(--steps),minmax(0,1fr));gap:4px;margin-top:4px;font-size:14px}
-.likert label{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:58px;padding:5px 0;border:1px solid #d1dbc9;border-radius:8px;background:#f6f8f1;cursor:pointer;line-height:1.4}
-.likert input[type=radio]{margin:0;flex-shrink:0}
-.likert label:has(input:checked){background:#e0eed9;border-color:#365f43;box-shadow:inset 0 0 0 1px #365f43}
-.likert label:has(input:focus-visible){outline:3px solid #b18b3c;outline-offset:2px}
-.likert-ends{gap:12px;font-size:13px;margin-top:4px;line-height:1.5}
-.likert-ends span{flex:1;overflow-wrap:anywhere}.likert-ends span:last-child{text-align:right}
-.option:has(input:checked){background:#e0eed9;border-color:#365f43}
+  :root { --bg:#0F2416; --bg2:#15301E; --card:#1B3324; --card2:#22402D; --line:#2E4A38; --text:#EAF2EC; --sub:#A9BEB0; --green:#6BBF59; --green2:#4A8C3F; --gold:#E9C46A; --warn:#E88A6F; }
+  html, body { background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%); min-height: 100%; }
+  body { color: var(--text); }
+  .jspsych-display-element { color: var(--text); }
+  .jspsych-content { max-width: 680px; font-size: 17px; line-height: 1.8; color: var(--text); }
+  .lg-box { text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 20px; margin: 10px 0; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+  .lg-box h2, .lg-box h3 { color: #CFEBC6; margin: 4px 0 12px; letter-spacing: .5px; }
+  .lg-box b { color: #fff; }
+  .lg-muted { color: var(--sub); font-size: 14px; }
+  .lg-form label.lg-radio { display: block; margin: 6px 0; padding: 10px 12px; background: var(--card2); border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }
+  .lg-form label.lg-radio:has(input:checked) { border-color: var(--green); background: #2A4F35; }
+  .lg-q { margin: 14px 0; padding: 10px 0 4px; border-top: 1px dashed var(--line); }
+  .lg-q input[type=text], .lg-q input[type=number], .lg-q textarea, .lg-q select, .lg-form input[type=text] { width: 100%; box-sizing: border-box; padding: 10px; font-size: 17px; color: var(--text); background: #0E1F14; border: 1px solid var(--line); border-radius: 10px; margin-top: 6px; }
+  .lg-q input[type=number] { width: 140px; }
+  input[type=checkbox], input[type=radio] { accent-color: var(--green); transform: scale(1.15); margin-right: 6px; }
+  .lg-likert { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 4px; font-size: 14px; }
+  .lg-likert label { display: flex; flex-direction: column; align-items: center; padding: 4px 0; border-radius: 8px; background: var(--card2); color: var(--text); }
+  .lg-likert label:has(input:checked) { background: #2A4F35; outline: 1px solid var(--green); }
+  .lg-likert-ends { display: flex; justify-content: space-between; margin-top: 6px; font-size: 13px; color: var(--sub); }
+  .lg-tree-row.lg-notree { grid-template-columns: 1fr; }
+  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 6px; background: linear-gradient(90deg, var(--green) 0%, var(--green) var(--fill,0%), var(--line) var(--fill,0%), var(--line) 100%); outline: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 3px solid var(--green); box-shadow: 0 2px 6px rgba(0,0,0,.35); }
+  input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 3px solid var(--green); }
+  .lg-sl { display: grid; grid-template-columns: 1fr 2em; align-items: center; gap: 10px; margin: 8px 0 0; }
+  .lg-sl output { font-weight: 700; color: #CFEBC6; text-align: right; }
+  .lg-sl-scale { display: flex; justify-content: space-between; margin: 2px 2.8em 0 0; font-size: 12px; color: var(--sub); }
+  .lg-pool { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; background: #0E1F14; border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; margin: 8px 0 14px; }
+  .lg-pool b { font-size: 28px; color: var(--gold); }
+  .lg-pool b.lg-done { color: var(--green); }
+  .lg-pool b.lg-over { color: var(--warn); }
+  .lg-pool-bar { flex-basis: 100%; height: 6px; background: var(--line); border-radius: 4px; overflow: hidden; }
+  #lg-pool-fill { height: 100%; width: 100%; background: var(--gold); transition: width .15s; }
+  .lg-tree-row { display: grid; grid-template-columns: 56px 1fr; gap: 12px; align-items: center; background: var(--card2); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; margin: 10px 0; }
+  .lg-tree { width: 56px; height: 56px; display: flex; align-items: flex-end; justify-content: center; background: radial-gradient(circle at 50% 90%, #3B2A1A 0 30%, transparent 31%); }
+  .lg-tree-icon { font-size: 30px; transition: transform .2s; transform-origin: 50% 100%; display: inline-block; }
+  .lg-tree-top { display: flex; justify-content: space-between; margin-bottom: 6px; }
+  .lg-tree-top .lg-name { font-weight: 600; }
+  .lg-tree-top output { font-weight: 700; color: #CFEBC6; }
+  .lg-breath { position: relative; width: 170px; height: 170px; margin: 18px auto; }
+  .lg-breath-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(107,191,89,.5); background: radial-gradient(circle, rgba(107,191,89,.18), rgba(107,191,89,0) 70%); }
+  .lg-breath.on .lg-breath-ring { animation: lg-breathe 10s ease-in-out infinite; }
+  .lg-breath-core { position: absolute; inset: 35px; border-radius: 50%; background: #1F4A2A; display: flex; align-items: center; justify-content: center; color: #CFEBC6; font-weight: 600; font-size: 15px; }
+  @keyframes lg-breathe { 0%,100% { transform: scale(.82); opacity: .6; } 50% { transform: scale(1.06); opacity: 1; } }
+  .lg-player { text-align: center; }
+  .lg-player button { font-size: 16px; padding: 9px 22px; margin: 0 6px; border-radius: 22px; border: 1px solid var(--line); background: var(--card2); color: var(--text); }
+  .lg-card { background: #2B2A1C; border: 1px solid #5A5230; color: #F1E6BE; border-radius: 12px; padding: 10px 12px; font-size: 14px; margin-top: 12px; }
+  .lg-code { font-family: Consolas, monospace; font-size: 26px; font-weight: 700; letter-spacing: 2px; color: var(--gold); margin: 10px 0; }
+  .lg-dd { font-size: 18px; }
+  .jspsych-btn { font-size: 17px; padding: 12px 28px; border-radius: 24px; border: none; background: var(--green2); color: #fff; margin: 8px 6px; box-shadow: 0 3px 10px rgba(0,0,0,.25); }
+  .jspsych-btn:hover { background: #57A04A; }
+  .jspsych-btn:disabled { background: #33463A; color: #7F9486; box-shadow: none; }
+  #jspsych-survey-html-form-next { font-size: 17px; padding: 12px 28px; border-radius: 24px; border: none; background: var(--green2); color: #fff; }
+  svg#lg-line line { stroke: #CFEBC6; } svg#lg-line text { fill: #A9BEB0; }
+  .lg-err { color: var(--warn); font-weight: 600; min-height: 1em; }
+  .lg-note { background: #0E1F14; border: 1px dashed var(--line); border-radius: 12px; padding: 10px 14px; margin: 6px 0 10px; }
+  .lg-dd b { display: inline-block; margin: 6px 0; }
+
+/* Adapt the original jsPsych content shell to the Experiment 2 form lifecycle. */
+#app{max-width:680px;width:95%;margin:auto;font-size:17px;line-height:1.8;text-align:center;color:var(--text)}
+.topbar{max-width:680px;margin:auto;padding:10px 0;display:flex;align-items:center;justify-content:space-between;font-size:14px;color:var(--sub)}
+.topbar button{padding:8px 18px;border-radius:22px;border:1px solid var(--line);background:var(--card2);color:var(--text)}
+.lg-box .page-title{font-size:1.17em;font-weight:bold;color:#CFEBC6;margin:4px 0 12px;letter-spacing:.5px;line-height:1.8;outline:none}
+fieldset.lg-q{min-width:0;border:0;border-top:1px dashed var(--line)}
+.lg-q legend{float:left;width:100%;padding:0;margin:0;font-weight:normal}.lg-q legend+*{clear:both}
+.lg-form .lg-radio{display:block;margin:6px 0;padding:10px 12px;background:var(--card2);border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.lg-form .lg-radio:has(input:checked){border-color:var(--green);background:#2A4F35}
+#choiceButtons{display:flex;justify-content:center;flex-wrap:wrap;gap:0}
+#choiceButtons .jspsych-btn{min-height:44px}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.lg-likert input{margin:3px 6px 3px 4px}.lg-likert label{min-width:0}
+.lg-sl input{min-width:0}.lg-sl output{white-space:nowrap;font-size:14px}.lg-sl:has(input:not([data-touched])){grid-template-columns:1fr 4.5em}
+/* Approved Experiment 2 exception: no initial dot; every 0–10 item must be touched. */
+input[data-required-touch]:not([data-touched])::-webkit-slider-thumb{opacity:0}input[data-required-touch]:not([data-touched])::-moz-range-thumb{opacity:0}
+.lg-form textarea{resize:vertical}.lg-tree-main{min-width:0}.lg-tree-top{gap:8px}.lg-tree-top output{white-space:nowrap}
+.recording{border:1px dashed var(--line);padding:10px 14px;border-radius:12px;margin:12px 0}.recording button{color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:22px;padding:8px 18px}.recording span{display:block;font-size:14px;color:var(--sub)}
+#previewBadge,#saveStatus{max-width:680px;width:95%;margin:8px auto;color:var(--sub);font-size:12px}#previewBadge{background:#2B2A1C;border:1px solid #5A5230;padding:8px 14px;border-radius:10px}
+.stack{display:grid;gap:10px}.stack button{font:inherit;border:1px solid var(--line);border-radius:22px;background:var(--green2);color:white;padding:10px 20px}
+dialog{max-width:min(92vw,520px);background:var(--card);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:22px}dialog::backdrop{background:#000a}
+.video-active{position:fixed!important;inset:0;max-width:none!important;width:100%!important;margin:0!important;padding:0!important;background:#d6d4cf;z-index:20}#practiceFrame{width:100%;height:100%;border:0;display:block}.letter{white-space:pre-wrap;overflow-wrap:anywhere}.code{font-size:26px;color:var(--gold);letter-spacing:2px}
+
+.field{display:block}.lg-q textarea{display:block} .lg-form label.option{display:block}

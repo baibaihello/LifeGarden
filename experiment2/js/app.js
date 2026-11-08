@@ -69,12 +69,12 @@ window.LG2_RUN_EXPERIMENT = async function () {
     state.data.recordings.push({ tag, filename, mimeType: blob.type, bytes: blob.size, atISO: now() });
     await checkpoint('recording');
   }
-  async function textResponse(title, prompt, tag, optional = true) {
+  async function textResponse(title, prompt, tag, optional = true, extraHtml = '') {
     let cleanup = () => {};
     const initialRecordings = (state.data.recordings || []).filter(r => r.tag === tag).length;
     const hasRecording = () => (state.data.recordings || []).filter(r => r.tag === tag).length > initialRecordings;
     let result;
-    try { result = await ui.form(title, '<p>' + prompt + '</p>' + field('free', '写几个字，也可以不写。', 'textarea'), {
+    try { result = await ui.form(title, '<p>' + prompt + '</p>' + extraHtml + field('free', '写几个字，也可以不写。', 'textarea'), {
       submit: optional ? '跳过' : '继续',
       onMount: form => {
         const submit = form.querySelector('[type=submit]');
@@ -93,19 +93,34 @@ window.LG2_RUN_EXPERIMENT = async function () {
     return { ...result, free: stripText(text), skipped: !String(text).trim() && !hasRecording() };
   }
   async function emotion(tag, short = false) {
-    let free = null;
-    if (!short) free = await textResponse('此刻的感受', '用一句话说说你此刻的感受。', tag + '_free');
     const order = state.design.emotionOrder;
     const panas = order.panas.map(id => bank.panas.find(item => item[0] === id));
     const singles = order.singles.map(id => bank.singles.find(item => item[0] === id));
-    let html = '';
+    const freeTag = tag + '_free';
+    const initialCount = (state.data.recordings || []).filter(r => r.tag === freeTag).length;
+    let cleanup = () => {}, result;
+    let html = short ? '' : '<div class="emotion-free">' + field('free', '用一句话说说你此刻的感受。（可打字、录音，也可不填）', 'textarea') + '</div>';
     if (!short) html += '<p>此刻你感受到下面各项的程度。</p>' + panas.map(([id, text]) =>
       field('e_' + id, text, 'likert', { max: 5, low: '几乎没有', high: '极其强烈' })).join('');
     html += '<p>请在线上点选，每一项都需要作答。</p>' + singles.map(([id, text]) => field('e_' + id, text, 'scale')).join('');
-    const result = numeric(await ui.form(short ? '此刻的感受' : '此刻的感受', html));
+    try {
+      result = numeric(await ui.form('此刻的感受', html, {onMount: form => {
+        if(short)return;
+        const target = form.querySelector('.emotion-free');
+        target.addEventListener('recordingbusy', e => {form.querySelector('[type=submit]').disabled=e.detail;});
+        LG2Recording.start(target, state.data.consent?.recording_ok === '1', cfg, blob => saveRecording(blob, freeTag))
+          .then(fn => {cleanup=fn;recordingCleanup=fn;});
+      }}));
+    } catch(error) {await cleanup();recordingCleanup=null;throw error;}
+    await cleanup();recordingCleanup=null;
     result.order_panas = short ? null : order.panas;
     result.order_single = order.singles;
-    if (free) result.free = free;
+    if(!short){
+      const text = result.values.free || '';
+      delete result.values.free;
+      result.free = {free:stripText(text),skipped:!text.trim() && (state.data.recordings || []).filter(r => r.tag===freeTag).length===initialCount,
+        responseMs:result.responseMs,measurementPage:'same_page_as_scales',interactions:result.interactions.free || null};
+    }
     put(tag, result);
     event('emotion_completed', { tag });
   }
@@ -119,31 +134,39 @@ window.LG2_RUN_EXPERIMENT = async function () {
     ] : [['P1', people.p1], ['P2', people.p2], ['P3', people.p3], ['S', '现在的自己'], ['F', '五年后的自己']];
     const total = money ? 1000 : 100, order = core.shuffle(items), trace = [];
     let start;
-    const html = '<p>' + (money ? '想象你意外得到1000元。请分到下面四个用途，每格50元，合计正好1000元。' :
-      '你手里有100份养分。拖动滑块，把它们分给下面五棵树。合计正好100，“现在的自己”至少1份。') +
-      '</p><p class="pool" aria-live="polite">还剩 <b id="remaining">' + total + '</b></p>' +
-      order.map(([id, text]) => '<label class="allocation"><span>' + (money ? '' : '<span class="tree" data-tree="' + id + '">🌱</span> ') +
-        escape(text) + '</span><input name="' + id + '" type="range" min="0" max="' + total +
-        '" step="' + (money ? 50 : 1) + '" value="0"><output>0</output></label>').join('');
+    const html = '<p>' + (money ? '想象你意外得到 <b>1000 元</b>。请分到下面四个用途，每格50元，合计正好1000元。' :
+      '你手里有 <b>100份养分</b>。拖动滑块，把它们分给下面五棵树。合计正好100，“现在的自己”至少1份。') +
+      '</p><div class="lg-pool"><span>还剩</span><b id="remaining">' + total + '</b><span>' + (money?'元':'份养分') +
+      '</span><div class="lg-pool-bar"><div id="lg-pool-fill"></div></div></div><div id="lg-garden">' +
+      order.map(([id,text]) => '<div class="lg-tree-row' + (money?' lg-notree':'') + '">' +
+        (money?'':'<div class="lg-tree" data-tree="' + id + '"><span class="lg-tree-icon">🌱</span></div>') +
+        '<div class="lg-tree-main"><div class="lg-tree-top"><span class="lg-name">' + escape(text) + '</span><output>0</output></div>' +
+        '<input name="' + id + '" aria-label="' + escape(text) + '" type="range" min="0" max="' + total + '" step="' + (money?50:1) + '" value="0"></div></div>').join('') + '</div>';
     const result = await ui.form(money ? '一笔意外的钱' : '今天的花园', html, {
+      singleBox:true, submit:'提交',
       validate: values => {
-        if (Object.values(values).reduce((sum, n) => sum + Number(n), 0) !== total) return '请分配到合计正好' + total;
-        if (!money && Number(values.S) < 1) return '现在的自己至少分配1份。';
+        if (Object.values(values).reduce((sum,n)=>sum+Number(n),0)!==total) return '请分配到合计正好'+total;
+        if(!money && Number(values.S)<1)return '现在的自己至少分配1份。';
       },
       onMount: form => {
-        start = performance.now();
-        form.querySelectorAll('input[type=range]').forEach(input => input.addEventListener('input', () => {
-          const values = Object.fromEntries(new FormData(form));
-          const remaining = total - Object.values(values).reduce((sum, n) => sum + Number(n), 0);
-          $('remaining').textContent = remaining;
-          input.nextElementSibling.textContent = input.value;
-          const tree = form.querySelector('[data-tree="' + input.name + '"]');
-          if (tree) {
-            tree.textContent = Number(input.value) < 1 ? '🌱' : Number(input.value) < 20 ? '🌿' : '🌳';
-            tree.style.transform = 'scale(' + (.8 + Number(input.value) / 100) + ')';
-          }
-          trace.push({ ms: Math.round(performance.now() - start), key: input.name, value: Number(input.value) });
+        start=performance.now();
+        const submit=form.querySelector('[type=submit]'); submit.disabled=true;
+        const inputs=[...form.querySelectorAll('input[type=range]')];
+        const update = () => {
+          const sum=inputs.reduce((sum,input)=>sum+Number(input.value),0), remaining=total-sum;
+          $('remaining').textContent=remaining;
+          $('remaining').className=remaining<0?'lg-over':remaining===0?'lg-done':'';
+          $('lg-pool-fill').style.width=Math.max(0,Math.min(100,remaining/total*100))+'%';
+          submit.disabled=!(sum===total && (money || Number(inputs.find(input=>input.name==='S').value)>=1));
+        };
+        inputs.forEach(input=>input.addEventListener('input',()=>{
+          input.parentElement.querySelector('output').textContent=input.value;
+          input.style.setProperty('--fill',Number(input.value)/total*100+'%');
+          const tree=form.querySelector('[data-tree="'+input.name+'"] .lg-tree-icon');
+          if(tree){const value=Number(input.value);tree.textContent=value===0?'🌱':value<total/5?'🌿':'🌳';tree.style.transform='scale('+(.8+value/total*1.43)+')';}
+          trace.push({ms:Math.round(performance.now()-start),key:input.name,value:Number(input.value)});update();
         }));
+        update();
       }
     });
     put(tag, { shares: Object.fromEntries(Object.entries(result.values).map(([k, v]) => [k, Number(v)])),
@@ -153,10 +176,14 @@ window.LG2_RUN_EXPERIMENT = async function () {
     const existing = state.data[tag] || { set, choices: [] };
     state.data[tag] = existing;
     const items = bank.dd[set];
+    if(!existing.introShown && !existing.choices.length){
+      const intro=await ui.choice('选择题', '<p>接下来是 ' + items.length + ' 道选择题：每一题请选你更想要的一项。没有对错，按你的真实偏好选。都是假设的选择，不涉及真实支付。</p>', ['继续']);
+      existing.introShown=true;existing.introResponseMs=intro.responseMs;await checkpoint(tag+'_intro');
+    }
     for (let i = existing.choices.length; i < items.length; i++) {
       const item = items[i];
-      const result = await ui.choice('你更想要哪一项？', '<p>没有对错，按你的真实偏好选择。都是假设选择，不涉及真实支付。</p>' +
-        '<p class="dd">A：现在得到 <b>' + item.ss + '元</b><br>B：' + item.delay + '天后得到 <b>' + item.ll + '元</b></p>',
+      const result = await ui.choice('你更想要哪一项？',
+        '<p class="lg-dd"><b>A：现在得到 ' + item.ss + ' 元</b><br><b>B：' + item.delay + ' 天后得到 ' + item.ll + ' 元</b></p>',
         ['A 现在', 'B 以后']);
       existing.choices.push({ item: i + 1, ...item, ll_chosen: result.choice === 1 ? 1 : 0, rt: result.responseMs });
       await checkpoint(tag + '_' + (i + 1));
@@ -303,7 +330,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
       '<br>伦理批件：' + escape(cfg.ETHICS_NO || '待补齐') + '</p><p>' + escape(cfg.STORAGE_NOTICE) +
       ' 自由文字只在你同意时保存原文，否则仅保存字数、用时及必要的安全标记。联系方式会与作答单独存文件。</p>' +
       '<p>录音是可选的，只有点击录音按钮并允许麦克风后才开始。语音只由研究人员收听，转为文字并去掉可识别信息后分析；原始录音在研究结束后12个月内删除，去标识数据按学校规定保存5年。你可以通过招募平台或联系邮箱申请撤回尚未汇入公开结果的数据。</p>' +
-      '<label class="option"><input type="checkbox" name="agree" value="1" required>我已年满18岁，读过说明并自愿参加。</label>' +
+      '<label class="lg-radio"><input type="checkbox" name="agree" value="1" required>我已年满18岁，读过说明并自愿参加。</label>' +
       '<details><summary>研究介绍书与联系方式</summary>'+window.LG2_CONSENT_DOCUMENT(cfg,preview)+'</details>'+
       field('ai_ok', '是否同意保存去标识文字，由人工智能辅助整理？', 'radio', { values: [{ value: '1', text: '同意' }, { value: '0', text: '不同意，只记字数和用时' }] }) +
       field('recording_ok', '是否同意在可选回答中使用录音？', 'radio', { values: [{ value: '1', text: '同意，我仍可选择打字或跳过' }, { value: '0', text: '不同意录音' }] }));
@@ -339,7 +366,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
     const result = await ui.form('基本信息',
       field('sex', '性别', 'radio', { values: ['男', '女', '其他／不愿透露'] }) +
       field('occupation', '职业类别', 'radio', { values: ['企业职员／管理', '专业技术人员', '服务业／销售', '一线操作／物流／快递', '机关事业单位', '自由职业／创业', '其他'] }) +
-      field('first_work_year', '首次全职工作的年份', 'number', { min: state.data.screen.year + 14, max: new Date().getFullYear() }) +
+      field('first_work_year', '首次全职工作的年份', 'select', {values:Array.from({length:new Date().getFullYear()-state.data.screen.year-13},(_,i)=>state.data.screen.year+14+i)}) +
       field('sle', '你觉得自己大概能活到多少岁？', 'number', { min: 40, max: 120, step: 1 }) +
       field('ret_age', '你预计自己大约几岁退休？', 'number', { min: 40, max: 100, step: 1 }) +
       field('fsc1', '五年后的我和现在的我，本质上是同一个人', 'likert', { low: '完全不同意', high: '完全同意' }) +
@@ -354,13 +381,13 @@ window.LG2_RUN_EXPERIMENT = async function () {
   stages.people = async () => {
     put('people', await ui.form('三位重要的人', '<p>请填写称呼或化名，尽量不要填写真实姓名。后面的练习会用到这些称呼。</p>' +
       [1, 2, 3].map(i => field('p' + i, '第' + i + '位重要的人的称呼', 'text', { maxlength: 30 }) +
-        field('p' + i + '_rel', '你们的关系', 'radio', { values: ['家人', '伴侣', '朋友', '同事', '其他'] })).join('')));
+        field('p' + i + '_rel', '你们的关系', 'select', { values: ['家人', '伴侣', '朋友', '同事', '其他'] })).join('')));
   };
   stages.garden_pre = () => allocator('garden_pre');
   stages.dd_pre = () => discount('dd_pre', state.design.ddOrder[0]);
   stages.emotion_pre = () => emotion('emotion_pre');
   stages.soundcheck = async () => {
-    await ui.form('试听', '<p>请点击播放，确认能听清声音。未能播放时请检查设备静音开关或换浏览器。</p><audio controls src="player/media/soundcheck.mp3" preload="metadata"></audio><label class="option"><input name="sound_ok" type="checkbox" required value="1">我能听清声音</label>');
+    await ui.form('试听', '<p>请点击播放，确认能听清声音。未能播放时请检查设备静音开关或换浏览器。</p><audio controls src="player/media/soundcheck.mp3" preload="metadata"></audio><label class="lg-radio"><input name="sound_ok" type="checkbox" required value="1">我能听清声音</label>');
     put('soundcheck',{confirmed:true});
   };
   stages.prepare = async () => {
@@ -444,8 +471,9 @@ window.LG2_RUN_EXPERIMENT = async function () {
   stages.free_write = async () => {
     if (state.data.free_choice.choice === 'skip') return;
     const isPerson = state.data.free_choice.choice === 'person';
-    if(isPerson){const target=await ui.form('写给谁',field('to','选择一位重要的人','radio',{values:[1,2,3].map(i=>({value:'P'+i,text:state.data.people.values['p'+i]}))}));put('free_recipient',target.values);}
-    const result = await textResponse('写几句话', isPerson ? '写下想对一位重要的人说的话。' : '写给五年后的自己。', 'free_write');
+    const recipient = isPerson ? field('to','写给谁','select',{values:[1,2,3].map(i=>({value:'P'+i,text:state.data.people.values['p'+i]}))}) : '';
+    const result = await textResponse('写几句话', isPerson ? '写下想对一位重要的人说的话。' : '写给五年后的自己。', 'free_write', true, recipient);
+    if(isPerson){put('free_recipient',{to:result.values.to});delete result.values.to;}
     transient.letter = ui.main.querySelector('textarea')?.value || '';
     put('free_write', result);
   };

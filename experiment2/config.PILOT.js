@@ -1,8 +1,8 @@
 window.LG2_CONFIG = {
-  VERSION: 'experiment2-full-v1.0.4',
+  VERSION: 'experiment2-full-v1.1.0',
   PROTOCOL: 'v0.9 draft + approved v0.9C text / three-layer choices / v0.16 media',
   MODE: 'review',
-  RUN_MODE: 'production', // 技术预跑：仅本地保存，不占正式分组，不发送短信
+  RUN_MODE: 'production', // PILOT材料预实验真实上传；试收需使用测试编号
   RECRUITMENT_PLATFORMS: ['naodao', 'credamo'],
   PHASE: 'PILOT',
   DATAPIPE_ID: 'Mn7Nkxd8gyJc',  // 实验 2 专用，2026-11-08 建；不是研究一的
