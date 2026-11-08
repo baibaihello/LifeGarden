@@ -1,7 +1,15 @@
 (() => {
   const expectedOrigin = location.protocol === 'file:' ? 'null' : location.origin;
   let nonce = null, parameters = null, initialized = false, completed = false;
-  let shownYear = null;
+  let shownYear = null, firstPrepared = false;
+  async function prepareFirst(){
+    start.disabled=true;start.textContent='正在准备画面和声音……';
+    const first=config.segments[0];
+    if(video.error||video.src!==new URL(first.video,location.href).href){video.src=first.video;video.load();}
+    if(audio.error||audio.src!==new URL(first.audio,location.href).href){audio.src=first.audio;audio.load();}
+    try{await Promise.all([mediaReady(audio,3),mediaReady(video,2)]);firstPrepared=true;status('');start.textContent='开始观看';start.disabled=false;}
+    catch(error){firstPrepared=false;start.textContent='重新准备画面和声音';start.disabled=false;status('素材准备未完成，请重试。');}
+  }
   function payload() {
     return {
       mediaVersion: config.version, interactionVersion: config.interactionVersion,
@@ -56,6 +64,7 @@
   const initialStart = start.onclick;
   start.onclick = async () => {
     if (!initialized || completed) return;
+    if(!firstPrepared){prepareFirst();return;}
     await initialStart();
   };
   window.addEventListener('message', e => {
@@ -69,7 +78,7 @@
       config.group = e.data.group; config.timeoutPolicyApproved = e.data.timeoutPolicyApproved;
       config.backgroundWaitPolicy = e.data.timeoutPolicy;
       start.textContent = config.group === 'common' ? '开始观看' : '继续练习';
-      start.disabled = false;
+      prepareFirst();
     } else if(e.data.nonce===nonce&&e.data.type==='finalize_exit'){
       if(typeof currentQuestion!=='undefined'&&currentQuestion&&!responses.some(r=>r.station===currentQuestion.station))recordAbandonedResponse();
       record('exit',{waitMs:Math.round(waitMs)});stop();room.pause();phase='exited';send('exit_finalized',{...payload(),reason:e.data.reason});

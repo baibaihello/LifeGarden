@@ -1,29 +1,33 @@
 {
-  "materialHash": "042e5bc9d60012b325224677237f01cf0e728d700a6fade1c007f97abf117690",
+  "materialHash": "d6a7790c49efcaa9069311306fe7eb3053c17365c00ed5da26d24e3d7b112348",
   "code": {
     "config.PILOT.js": "88bf6048403eeb413ca993ecc62ff1faa6ed226fecd989f1be9596994f3fcf95",
     "credamo.html": "0dce737e3a9ec28b4ff994a2849a7826c9bbf693fa2931e7430716a28687e28a",
-    "index.html": "5b0d5027f69709d15884a79e71093b864cc067b31dabc09fafa5d6fbdc9f7c64",
-    "js/app.js": "955b6f4b41e4e48ebdc41ddefb24ea651dddb60d4697d261b864673009cf3902",
+    "index.html": "5ba4490505e9cb660dedb534446eaeff4f7d61ec85b057983b111fc7bd6ec8bf",
+    "js/app.js": "631a64caab58c80ca0c853591faef170084fde133396206568beeaa6fe64f551",
     "js/bank.js": "c5ecaa6506b25d5aa2c8af759a4c061651591656f7d377662cf4e2d9e84a218f",
     "js/bootstrap.js": "4af190f468740e5b2cc702ffa352d5c463312d0f877524df76a5a311fe7dacec",
     "js/consent.js": "5cdf5f422ada57faa29c73866c4e8d3d301fec8247c01ac61998bed06572f4b3",
     "js/core.js": "cce3b09e2bd4ff9f966c8e7f643c207445c1e6f274b4d68717a663f53eee870f",
-    "js/media-configs.js": "9f3b2de85e7b09accf07f5fb8cf2fc0917faa307de01ecb33be33698def1e6cf",
+    "js/media-configs.js": "0a3e7b03b9933fc867f4a28f845f4ea2e61fe0555a09e56a1dbaa5a3e2118091",
     "js/recording.js": "6f63f42f2e314d4fac8eebfd9a28f623648fe7f954df9aff4ee2bfa8d7273342",
     "js/storage.js": "aa3035eb6699b848edda769cb189517cbcbfedf8bf3fe5201488c0e496a6c980",
     "js/ui.js": "f0d11fcfab39dd4df4733c686b65f3ca570c1326cf5e6f0e84717d0f6ddc4440",
     "naodao.html": "5d8c051bf41347661e5ca26c80f4f2dd69d269606d402bd98abf6dd6ef0949ab",
     "offline.html": "73b5bd0d9db67219afb671a9d0f1d3556f901d57799cb2be45bcf3b795ce0804",
-    "pilot.html": "52cae4efe09f59bee93aeff7502de6d529dc83478bb6ec78dc635559d015479e",
-    "player/R.html": "a3cf006c9dd571fe2c5b32d3f098e5155a857f09d187f8b9984a4708aa4a9304",
-    "player/S.html": "a361131d2055c596bd7bae582ae21bdaa88cbbfdb1dc0506b7e3f3605790cd5e",
-    "player/bridge.js": "d5d432e827c9557a16f1e9421f97a1eed82f389e48375bafcfb2bb8e1ac42efd",
-    "player/common.html": "ab5c41f430963e150e56afc235a4d7dd43eb0695a642b85fbc62a2fb25f104d7",
+    "pilot.html": "1698582eda4d9a7882c0767978246cb6fd753bb0f1a8d11788aa9d639387be28",
+    "player/R.html": "e016ae1560ec8bbc1fc8c2b632dd54d142c4a32e5eac3b5078447063f25c0b55",
+    "player/S.html": "46ff5723bf933873ef4b74be2635c32bda1841c653b7fa3bb15ced3a348646bb",
+    "player/bridge.js": "14a3c5d4a6df00f53de9981e73de13a101ba0edc7cf779f1b3d9704aea272d99",
+    "player/common.html": "d384618651187668ef33623be441694c3e254876d82da772df51391444a26675",
     "styles.css": "e97d55f86c91ff5ea5712b57887c7614f0697b7e48c0ea8c747945f251ed2d8c",
     "vendor/jspsych.js": "0715e5c588db45d4cda0ad8f4a22e1e6faf9ee75bcb863f9c0afa2a35ba78eb7"
   },
   "media": {
+    "player/media/C.m4a": {
+      "bytes": 622466,
+      "sha256": "4f84795db63bbd92e7452deb9048735d0799020940c5ae2f256c9ee95bcc3065"
+    },
     "player/media/C.mp4": {
       "bytes": 2433396,
       "sha256": "089ca27ae2b94e0afd94089f5ffe5f91fd4e97edb3a7dc53d545f5331e417238"
@@ -45,20 +49,36 @@
       "bytes": 828967,
       "sha256": "3615b1b64f5d90fd89b1236b6c3be89915f2b33a91a0dc3cf39ea737d2ab99af"
     },
+    "player/media/R_audio1.m4a": {
+      "bytes": 237427,
+      "sha256": "e5f2ce718fd953bff24f8e8596ab39859ef1c4fd00471b46f9096f4f57c334f8"
+    },
     "player/media/R_audio1.wav": {
       "bytes": 1600156,
       "sha256": "9d7e03d1390167ea9100a44f656a90459afa36ee9734cfd15d47da451aaa8d11",
       "durationSeconds": 18.14185941043084
+    },
+    "player/media/R_audio2.m4a": {
+      "bytes": 414963,
+      "sha256": "e9da6c3afffce6a7c75266ec009f525dc06272b4dba00d891449f3a60515fb47"
     },
     "player/media/R_audio2.wav": {
       "bytes": 3210532,
       "sha256": "6346e6e5d5638ed9cfb86dfe731923e9222882b00ed63326e825d9bdc09e985d",
       "durationSeconds": 36.40009070294784
     },
+    "player/media/R_audio3.m4a": {
+      "bytes": 435938,
+      "sha256": "4990333bf97f23198e6e7c785db011da520a281dcde9a2183b1cc39d34f72aca"
+    },
     "player/media/R_audio3.wav": {
       "bytes": 3295610,
       "sha256": "88606c443d7e8df3fed19749870f153fc50fff6260bde348aeea1599a503c905",
       "durationSeconds": 37.36469387755102
+    },
+    "player/media/R_audio4.m4a": {
+      "bytes": 449778,
+      "sha256": "aa2b97443ac1b35ce96e8e0158cddce91e7bf654001a45cf25adc70b24141914"
     },
     "player/media/R_audio4.wav": {
       "bytes": 3696472,
@@ -93,30 +113,54 @@
       "bytes": 645700,
       "sha256": "405e75ad531ac0a91d52b14dc952728e85dec9c3e6f429ae89f4ca3bd4c88e4d"
     },
+    "player/media/S_audio1.m4a": {
+      "bytes": 259023,
+      "sha256": "0bd6171ee8bf7ad4a9ba017e9d3935cfff1375a5dc7d0847a76481302f60eeb1"
+    },
     "player/media/S_audio1.wav": {
       "bytes": 1698724,
       "sha256": "a317eecad7868165671c13e1c08c166dcc004add8796c46ef3d598a2d0464cb3",
       "durationSeconds": 19.259410430839
+    },
+    "player/media/S_audio2.m4a": {
+      "bytes": 208749,
+      "sha256": "17d63eaf803c591b7b05931a0461fc0777dad244beee6eeb6cf95ccb844a196f"
     },
     "player/media/S_audio2.wav": {
       "bytes": 1757904,
       "sha256": "ac20dea6d430ba86dd633bdae335012d1e6c311c9ab39df6b526a6e0d15df551",
       "durationSeconds": 19.930385487528344
     },
+    "player/media/S_audio3.m4a": {
+      "bytes": 246336,
+      "sha256": "39e459b60c81408c883e4d312f8879b931c00c972bc06af1ef086b0c573eb24f"
+    },
     "player/media/S_audio3.wav": {
       "bytes": 1644932,
       "sha256": "fe3487f1a7e8f0bcc683ba5851eaba2741a31bd61cda8b75512685b22c7ecd7c",
       "durationSeconds": 18.64952380952381
+    },
+    "player/media/S_audio4.m4a": {
+      "bytes": 207880,
+      "sha256": "142da9ab57da1c9bc268fef113dd3f3dcbd1d68d5f8ded040a0c5ec1bb35b1df"
     },
     "player/media/S_audio4.wav": {
       "bytes": 1762492,
       "sha256": "d616d9976a594596a35016fccfcf2455f575eba6dd301c25d358f6152d1dea72",
       "durationSeconds": 19.982403628117915
     },
+    "player/media/S_audio5.m4a": {
+      "bytes": 214091,
+      "sha256": "bb5a216c048238ae0e177b13c00f344888fadc9ebf8c880693a16a5be38d7a80"
+    },
     "player/media/S_audio5.wav": {
       "bytes": 1470832,
       "sha256": "371c2b0ab7f48e3bd7b092f2bc2eeb0f77682cb36cff9c7a6a07b0471452d946",
       "durationSeconds": 16.67560090702948
+    },
+    "player/media/S_audio6.m4a": {
+      "bytes": 426167,
+      "sha256": "bebcf8e80f055c1c4b6b8b4a009ee1841d9de8dec80a6cd019d683ab3e77dac1"
     },
     "player/media/S_audio6.wav": {
       "bytes": 3574086,

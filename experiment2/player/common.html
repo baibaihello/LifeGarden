@@ -29,16 +29,31 @@
 <section id="choicePanel" hidden><h2 id="choiceTitle" tabindex="-1">请选择最接近你此刻想法的一项</h2><div id="choices"></div></section>
 <div class="actions"><button id="pause">暂停</button><button id="exit">退出</button></div><p id="status" role="status"></p>
 <section id="intro"><h1>一段互动练习</h1><p>请打开声音。本片有三次选择，点选后继续观看。<br>选择用来记录你注意到了什么，后面的内容按原顺序继续。</p><p id="variant"></p><button id="start">开始观看</button><p id="end" hidden>本次观看已结束。</p></section>
-<details id="settings" hidden><select id="policy"><option value="foreground_active" selected>前台计时</option><option value="wall_clock">后台计时</option></select><div id="inputs"></div><button id="export">导出记录</button></details></main><audio id="audio" preload="auto"></audio><script id="config" type="application/json">{"version": "浇水收尾与播放修复v0.16", "audioVersion": "实录声学初校；S01—S04保留验收音轨", "textVersion": "v0.9C及批准共同段补丁", "pauseHandling": "音轨已含4秒，不重复增加", "timeoutSeconds": 20, "backgroundWaitPolicy": "foreground_active", "segments": [{"id": "C", "audio": "media/C.wav", "video": "media/C.mp4", "duration": 56.052721088435376, "station": false, "stationAt": null, "captions": [{"id": "C01", "start": 0, "end": 17.09401360544218, "text": "接下来，你会走进自己人生里的一天。画面会自己慢慢往下走，你跟着看就好；想停下来，随时可以按暂停。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "C02", "start": 17.09401360544218, "end": 26.628299319727894, "text": "这是你生命的最后一天。这一天结束的时候，你会死去。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "C03", "start": 26.628299319727894, "end": 36.33807256235828, "text": "你在自己的房间里醒来。看看周围，光从一个地方照进来。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "C04", "start": 36.33807256235828, "end": 44.261473922902496, "text": "房间里很静。外面有一点声音传进来。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "C05", "start": 44.261473922902496, "end": 56.052721088435376, "text": "手边放着几样东西。身边也许有人，也许没有。你就在这里，在这一天的开头。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}], "timingStatus": "实录声学边界初校；逐字听审待完成", "visualStatus": "C02 v001；C03/C05 v002；C04保留v001近景", "environmentRoom": true}], "options": ["工作或学习", "人与关系", "身体和日常", "常做的事", "没有清楚画面"], "scope": "C01—C05、R01—R12、T01—T02", "backgroundPolicyNote": "仅审片暂用前台计时，正式策略待确认", "group": "R", "interactionVersion": "three-layer-candidate-v1", "analysisUse": "stations2and3_descriptive_only", "threeLayerPrompts": {"sensoryTemplate": "关于「{领域}」，此刻你注意到的是——", "reselect": "现在呢？", "clarity": "此刻，画面有多清楚？"}}</script><script>function setViewportHeight(){document.documentElement.style.setProperty('--app-height',(window.visualViewport?window.visualViewport.height:window.innerHeight)+'px')}setViewportHeight();window.addEventListener('resize',setViewportHeight);if(window.visualViewport)window.visualViewport.addEventListener('resize',setViewportHeight);const config=JSON.parse(document.getElementById('config').textContent);
+<details id="settings" hidden><select id="policy"><option value="foreground_active" selected>前台计时</option><option value="wall_clock">后台计时</option></select><div id="inputs"></div><button id="export">导出记录</button></details></main><audio id="audio" preload="auto"></audio><script id="config" type="application/json">{"version": "浇水收尾与播放修复v0.16", "audioVersion": "实录声学初校；S01—S04保留验收音轨", "textVersion": "v0.9C及批准共同段补丁", "pauseHandling": "音轨已含4秒，不重复增加", "timeoutSeconds": 20, "backgroundWaitPolicy": "foreground_active", "segments": [{"id": "C", "audio": "media/C.m4a", "video": "media/C.mp4", "duration": 56.052721088435376, "station": false, "stationAt": null, "captions": [{"id": "C01", "start": 0, "end": 17.09401360544218, "text": "接下来，你会走进自己人生里的一天。画面会自己慢慢往下走，你跟着看就好；想停下来，随时可以按暂停。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "C02", "start": 17.09401360544218, "end": 26.628299319727894, "text": "这是你生命的最后一天。这一天结束的时候，你会死去。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "C03", "start": 26.628299319727894, "end": 36.33807256235828, "text": "你在自己的房间里醒来。看看周围，光从一个地方照进来。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "C04", "start": 36.33807256235828, "end": 44.261473922902496, "text": "房间里很静。外面有一点声音传进来。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}, {"id": "C05", "start": 44.261473922902496, "end": 56.052721088435376, "text": "手边放着几样东西。身边也许有人，也许没有。你就在这里，在这一天的开头。", "freeze": null, "overlay": "", "video": null, "mediaIn": 0}], "timingStatus": "实录声学边界初校；逐字听审待完成", "visualStatus": "C02 v001；C03/C05 v002；C04保留v001近景", "environmentRoom": true}], "options": ["工作或学习", "人与关系", "身体和日常", "常做的事", "没有清楚画面"], "scope": "C01—C05、R01—R12、T01—T02", "backgroundPolicyNote": "仅审片暂用前台计时，正式策略待确认", "group": "R", "interactionVersion": "three-layer-candidate-v1", "analysisUse": "stations2and3_descriptive_only", "threeLayerPrompts": {"sensoryTemplate": "关于「{领域}」，此刻你注意到的是——", "reselect": "现在呢？", "clarity": "此刻，画面有多清楚？"}}</script><script>function setViewportHeight(){document.documentElement.style.setProperty('--app-height',(window.visualViewport?window.visualViewport.height:window.innerHeight)+'px')}setViewportHeight();window.addEventListener('resize',setViewportHeight);if(window.visualViewport)window.visualViewport.addEventListener('resize',setViewportHeight);const config=JSON.parse(document.getElementById('config').textContent);
 const $=id=>document.getElementById(id);
 const audio=$('audio'),video=$('video'),cover=$('cover'),ctx=cover.getContext('2d');
 const soundEnabled=new URLSearchParams(location.search).get('sound')!=='off';
-const room=new Audio('media/room_loop.wav'),fx=new Audio();room.loop=true;room.preload='auto';fx.preload='auto';let roomFailed=false,fxFailed=false;
+const room=new Audio('media/room_loop.wav'),fx=new Audio();room.loop=true;room.preload='auto';fx.preload='auto';let roomFailed=false,fxFailed=false,roomStarting=false;
 $('variant').textContent=soundEnabled?'共同开头及卧室采用关窗低底声':'无环境声对照';
 const notice=document.createElement('div');notice.style.cssText='position:absolute;top:36px;left:10px;z-index:20;background:#fff;color:#333;padding:4px';notice.hidden=true;document.querySelector('main').append(notice);
-function ambientFail(kind,e){if(kind==='room')roomFailed=true;else fxFailed=true;record('environment_error',{kind,reason:String(e)});notice.textContent='环境声未能播放；当前按无该层声音继续。';notice.hidden=false;}
+function ambientFail(kind,e){
+ const transient=kind==='room'&&['AbortError','NotAllowedError'].includes(e?.name);
+ if(e?.name==='AbortError'){record('environment_interrupted',{kind,reason:String(e)});return;}
+ if(kind==='room')roomFailed=!transient;else fxFailed=true;
+ record('environment_error',{kind,reason:String(e),recoverable:transient});
+ notice.textContent=transient?'环境声尚未启动，可在暂停后点继续重试。':'环境声未能加载；当前按无该层声音继续。';notice.hidden=false;
+}
 room.onerror=()=>ambientFail('room','load');fx.onerror=()=>ambientFail('fx','load');
-function ambientSync(){if(!soundEnabled||roomFailed)return;if(!segment().environmentRoom){room.pause();return;}if(['idle','paused','complete','exited'].includes(phase)){room.pause();}else if(room.paused){room.play().catch(e=>ambientFail('room',e));}}
+function startRoom(){
+ if(!soundEnabled||roomFailed||roomStarting||!segment().environmentRoom||!room.paused)return;
+ roomStarting=true;
+ room.play().then(()=>{notice.hidden=true;}).catch(e=>ambientFail('room',e)).finally(()=>{roomStarting=false;});
+}
+function ambientSync(){
+ if(!soundEnabled||roomFailed)return;
+ if(!segment().environmentRoom||['idle','paused','complete','exited'].includes(phase)){room.pause();return;}
+ if(['starting','playing','waiting','revealing'].includes(phase))startRoom();
+}
 const imported=new Map(),fileRecords=new Map();
 let retryMedia=false;
 let part=0,phase='idle',previousPhase=null,epoch=0,events=[],choiceResolved=false;
@@ -148,7 +163,10 @@ function updateCaption(){
 async function enter(){
  stop();retryMedia=false;phase='preparing';epoch++;captionId='';pendingStation=false;
  const first=segment().captions[0];
- video.src=visualSource(first);loadedVideo=video.src;video.load();audio.src=src('audio');audio.load();
+ const nextVideo=new URL(visualSource(first),location.href).href,nextAudio=new URL(src('audio'),location.href).href;
+ if(video.src!==nextVideo){video.src=nextVideo;video.load();}
+ if(audio.src!==nextAudio){audio.src=nextAudio;audio.load();}
+ loadedVideo=video.src;
  
  record('segment_enter',{sourceVideo:segment().video,visualStatus:segment().visualStatus});
  updateCaption();await resumeMedia();
@@ -263,6 +281,7 @@ function resolve(choice){
 $('pause').onclick=()=>{
  if(phase!=='paused'){pause();return;}
  record('resume_requested');
+ startRoom();
  if(document.hidden)return;
  if(previousPhase==='revealing'){revealChoices();return;}
  if(previousPhase==='waiting'){
@@ -286,7 +305,7 @@ $('start').onclick=async()=>{
  room.pause();room.currentTime=0;fxFailed=false;epoch++;events=[];responses=[];currentQuestion=null;pendingRecovery=null;part=0;waitMs=0;waitMark=null;choiceResolved=false;cover.hidden=true;
  record('sample_start',{version:config.version,audioVersion:config.audioVersion,pauseHandling:config.pauseHandling,
   environmentEnabled:soundEnabled,environmentVersion:config.environmentVersion,timeoutPolicy:config.backgroundWaitPolicy,timeoutPolicyApproved:!!config.timeoutPolicyApproved,importedMedia:Array.from(fileRecords.entries())});
- $('settings').open=false;await enter();
+ $('settings').open=false;startRoom();await enter();
 };
 $('policy').onchange=()=>{
  if(active()){$('policy').value=config.backgroundWaitPolicy;status('请退出后再改测试策略。');return;}
@@ -404,4 +423,4 @@ if(['concrete','unclear','timeout'].includes(demonstration)){
  alignVideoOverlays();
 })();
 </script>
-<script src="bridge.js?v=20261108-playfix2"></script>
+<script src="bridge.js?v=20261108-light1"></script>
