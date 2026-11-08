@@ -11,6 +11,17 @@ window.LG2_RUN_EXPERIMENT = async function () {
   let recordingCleanup = null,retainedFrame=null;
   const now = () => new Date().toISOString();
   const uuid = () => crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint32Array(4)), n => n.toString(16)).join('-');
+  function completionCode(status) {
+    const random = crypto.getRandomValues(new Uint32Array(5));
+    if (status !== 'completed') return 'LG0-' + String(random[0] % 1000000).padStart(6, '0');
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const hours = Math.floor((Date.now() - Date.UTC(2026, 8, 1)) / 3600000);
+    const t = ((hours % 1024) + 1024) % 1024;
+    const seven = Array.from(random, n => alphabet[n % 32]).join('') + alphabet[Math.floor(t / 32)] + alphabet[t % 32];
+    const check = [...seven].reduce((sum, char, i) => sum + alphabet.indexOf(char) * (i + 1), 0) % 32;
+    const code = seven + alphabet[check];
+    return code.slice(0, 4) + '-' + code.slice(4);
+  }
   function event(type, extra = {}) {
     state.events.push({ type, stage: state.plan[state.cursor], atISO: now(), monotonicMs: performance.now(), ...extra });
   }
@@ -518,8 +529,14 @@ window.LG2_RUN_EXPERIMENT = async function () {
   stages.debrief = () => ui.choice('完成了，谢谢你', '<p>刚才是一次想象练习。研究比较从生命终点回望与停留，以及想还没一起做的事与已经做过的事，对此刻感受和选择的影响。</p>' +
     '<p>' + escape(cfg.RESOURCE_CARD) + '</p>', ['保存并结束']);
   stages.ending = async () => {
-    state.completion ||= { atISO: now(), code: cfg.COMPLETION_PREFIX + '-' + state.id.replace(/-/g, '').slice(-8).toUpperCase(),
-      status: state.screenedOut ? 'screened_out' : state.withdrawal ? state.withdrawal.type : 'completed' };
+    const status = state.screenedOut ? 'screened_out' : state.withdrawal ? state.withdrawal.type : 'completed';
+    state.completion ||= { atISO: now(), code: completionCode(status), status };
+    const expected = status === 'completed' ? /^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/ : /^LG0-[0-9]{6}$/;
+    if (!expected.test(state.completion.code)) {
+      state.completion.legacyCode = state.completion.code;
+      state.completion.code = completionCode(status);
+      event('completion_code_format_updated', { status });
+    }
     await checkpoint('final');
     $('withdraw').disabled = true;
     const show = async () => {
@@ -616,13 +633,13 @@ window.LG2_RUN_EXPERIMENT = async function () {
       const previous = localStorage.getItem(offlineKey) || '';
       await ui.form('参加互动练习',
         '<p>欢迎参加。点击下方按钮开始互动练习。</p>' +
-        '<p><a href="index.html?mode=preview&v=20261108-offline3">研究者演练（不上传、不占分组号）</a></p>',
+        '<p><a href="index.html?mode=preview&v=20261108-retry1">研究者演练（不上传、不占分组号）</a></p>',
         { submit: '开始参加' });
       pid = previous || 'OFFLINE-' + uuid();
       localStorage.setItem(offlineKey, pid);
     }
     if (!preview && !pid) {
-      ui.mount('请从招募平台进入', '<p>链接中未收到参与者编号。通过脑岛或见数参加，请回到招募平台重新进入。</p><p>如果你是线下招募的参加者，请使用下方入口。</p><p><a href="index.html?platform=offline&v=20261108-offline3">线下参加入口</a></p><p><a href="index.html?mode=preview&v=20261108-offline3">研究者演练（不上传、不占号）</a></p>');
+      ui.mount('请从招募平台进入', '<p>链接中未收到参与者编号。通过脑岛或见数参加，请回到招募平台重新进入。</p><p>如果你是线下招募的参加者，请使用下方入口。</p><p><a href="index.html?platform=offline&v=20261108-retry1">线下参加入口</a></p><p><a href="index.html?mode=preview&v=20261108-retry1">研究者演练（不上传、不占号）</a></p>');
       return;
     }
     let pointer = preview ? 'LG2_preview_session' : 'LG2_session_' + cfg.PHASE + '_' + await core.hash(pid);
@@ -641,6 +658,16 @@ window.LG2_RUN_EXPERIMENT = async function () {
     if (query.get('new') === '1' && preview){sessionKey=null;const url=new URL(location.href);url.searchParams.delete('new');history.replaceState(null,'',url);}
     state = sessionKey ? await storage.read('states', sessionKey) : null;
     if (state && !preview && state.pid !== pid) throw Error('本机作答编号不一致，请联系研究者。');
+    let retryOf = null;
+    if (state && (state.screenedOut || state.data?.eligibility?.eligible === false)) {
+      const answer = await ui.choice('上次作答已结束',
+        '<p>上次作答因筛查条件结束。如果刚才误选，可以重新填写；请按真实情况回答，新一轮仍会经过完整筛查。</p>',
+        ['刚才误选，重新填写', '查看上次结束页']);
+      if (answer.choice === 0) {
+        retryOf = state.id;
+        state = null;
+      } else { await stages.ending(); return; }
+    }
     if (preview && state && (state.completion || state.version !== cfg.VERSION)) {
       const answer = await ui.choice('重新预跑', '<p>上次预跑已经结束，或使用了旧版本。可以从头再跑，重新填写筛查；旧记录保留，不上传。</p>', ['开始新一轮预跑', '保留记录，暂不开始']);
       if(answer.choice === 1)return;
@@ -662,6 +689,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
           emotionOrder: { panas: core.shuffle(bank.panas.map(item => item[0])), singles: core.shuffle(bank.singles.map(item => item[0])) }
         }
       };
+      if (retryOf) event('screening_retry_started', { previousSessionId: retryOf });
       localStorage.setItem(pointer, state.key);
       await checkpoint('initialized');
     }
