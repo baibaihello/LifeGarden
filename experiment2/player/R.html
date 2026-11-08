@@ -82,7 +82,7 @@ function mediaReady(media,minimum){
  if(media.error)return Promise.reject(new Error('素材无法加载：'+media.error.code));
  if(media.readyState>=minimum&&!media.seeking)return Promise.resolve();
  return new Promise((resolve,reject)=>{
-  const timer=setTimeout(()=>finish(new Error('素材加载超时')),15000);
+  const timer=setTimeout(()=>finish(new Error('素材加载超时')),60000);
   const check=()=>{if(media.readyState>=minimum&&!media.seeking)finish();};
   const fail=()=>finish(new Error('素材无法加载'));
   function finish(error){
@@ -95,12 +95,14 @@ function mediaReady(media,minimum){
 }
 function painted(){return new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));}
 async function resumeMedia(){
- const token=++epoch;phase='preparing';ui();
+ const token=++epoch;phase='preparing';ui();status('正在加载画面和声音，请稍候……');
  const audioPosition=audio.currentTime,videoPosition=video.currentTime;
  try{
   if(retryMedia){
    retryMedia=false;
-   video.load();audio.load();
+   // Do not restart healthy downloads or ready media after a slow connection.
+   if(video.error||video.networkState===3||video.networkState===0)video.load();
+   if(audio.error||audio.networkState===3||audio.networkState===0)audio.load();
    await Promise.all([mediaReady(audio,2),mediaReady(video,2)]);
    if(token!==epoch)return;
    if(audioPosition>0)audio.currentTime=audioPosition;
@@ -402,4 +404,4 @@ if(['concrete','unclear','timeout'].includes(demonstration)){
  alignVideoOverlays();
 })();
 </script>
-<script src="bridge.js?v=20261108-playfix1"></script>
+<script src="bridge.js?v=20261108-playfix2"></script>
