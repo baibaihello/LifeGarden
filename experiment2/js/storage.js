@@ -46,7 +46,24 @@ window.LG2Storage = (() => {
       if (upload) tx.objectStore('queue').put(upload);
     });
   }
+  function validateMainSnapshot(data) {
+    const visit = value => {
+      if (!value || typeof value !== 'object') return;
+      if (Object.prototype.hasOwnProperty.call(value, 'pendingFiles')) throw Error('主快照禁止包含pendingFiles');
+      Object.values(value).forEach(visit);
+    };
+    visit(data);
+    const allowed = new Set(['tag','filename','mimeType','bytes','atISO']);
+    for (const recording of data.data?.recordings || []) {
+      if (Object.keys(recording).some(key => !allowed.has(key))) throw Error('主快照录音仅允许元数据');
+    }
+  }
   async function request(path, body) {
+    if(path === 'data') {
+      const data = JSON.parse(body.data);
+      if(data.schemaVersion || Object.prototype.hasOwnProperty.call(data,'pendingFiles')) validateMainSnapshot(data);
+    }
+
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 20000);
     try {
@@ -92,5 +109,5 @@ window.LG2Storage = (() => {
   async function queue(entry) {
     return transaction(['queue'], 'readwrite', tx => tx.objectStore('queue').put(entry));
   }
-  return { open, read, all, checkpoint, queue, flush, request };
+  return { open, read, all, checkpoint, queue, flush, request, validateMainSnapshot };
 })();

@@ -71,10 +71,18 @@ window.LG2_RUN_EXPERIMENT = async function () {
   }
   async function textResponse(title, prompt, tag, optional = true) {
     let cleanup = () => {};
+    const initialRecordings = (state.data.recordings || []).filter(r => r.tag === tag).length;
+    const hasRecording = () => (state.data.recordings || []).filter(r => r.tag === tag).length > initialRecordings;
     let result;
     try { result = await ui.form(title, '<p>' + prompt + '</p>' + field('free', '写几个字，也可以不写。', 'textarea'), {
+      submit: optional ? '跳过' : '继续',
       onMount: form => {
-        LG2Recording.start(form, state.data.consent?.recording_ok === '1', cfg, blob => saveRecording(blob, tag))
+        const submit = form.querySelector('[type=submit]');
+        const update = () => { submit.textContent = form.querySelector('textarea').value.trim() || hasRecording() || !optional ? '继续' : '跳过'; };
+        form.addEventListener('input', update);
+        form.addEventListener('recordingbusy', e => { submit.disabled = e.detail; });
+        update();
+        LG2Recording.start(form, state.data.consent?.recording_ok === '1', cfg, async blob => { await saveRecording(blob, tag); update(); })
           .then(fn => { cleanup = fn; recordingCleanup = fn; });
       }
     });
@@ -82,7 +90,7 @@ window.LG2_RUN_EXPERIMENT = async function () {
     await cleanup(); recordingCleanup = null;
     const text = result.values.free;
     delete result.values.free;
-    return { ...result, free: stripText(text), skipped: !String(text).trim() };
+    return { ...result, free: stripText(text), skipped: !String(text).trim() && !hasRecording() };
   }
   async function emotion(tag, short = false) {
     let free = null;

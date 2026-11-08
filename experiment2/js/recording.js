@@ -7,6 +7,7 @@ window.LG2Recording = {
     target.append(section);
     const button = section.querySelector('button'), label = section.querySelector('span');
     let recorder, stream, timer, chunks = [], stopped = false, pending = null;
+    const busy = value => target.dispatchEvent(new CustomEvent('recordingbusy', {detail:value}));
     const stop = () => {
       if (recorder?.state === 'recording') recorder.stop();
       stream?.getTracks().forEach(track => track.stop());
@@ -14,7 +15,7 @@ window.LG2Recording = {
     };
     button.onclick = async () => {
       if (recorder?.state === 'recording') { stop(); return; }
-      button.disabled = true;
+      button.disabled = true; busy(true);
       try {
         stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         if (stopped) { stream.getTracks().forEach(t => t.stop()); return; }
@@ -34,12 +35,13 @@ window.LG2Recording = {
             label.textContent = '录音已保存在本次作答中。'; button.disabled = true;
           }).catch(error => {
             label.textContent = '录音保存失败，请打字回答或继续。'; console.error(error);
-          }) : Promise.resolve();
+          }).finally(() => busy(false)) : Promise.resolve().then(() => busy(false));
         };
         recorder.start(500); button.disabled = false; button.textContent = '停止录音';
         label.textContent = '正在录音'; timer = setTimeout(stop, config.RECORDING_MAX_SECONDS * 1000);
       } catch {
         stream?.getTracks().forEach(t => t.stop());
+        busy(false);
         label.textContent = '未能开启麦克风，可以打字或跳过。'; button.disabled = false;
       }
     };
